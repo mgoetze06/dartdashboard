@@ -1,0 +1,54 @@
+@page "/"
+<PageTitle>Index</PageTitle>
+<RadzenRow Gap="5" RowGap="5">
+    <RadzenColumn Size="12">
+        <RadzenLabel Text="Dart Dashboard" Style="width: 100%; font-style: normal; text-align: center; font-size: 20px" />
+    </RadzenColumn>
+    <RadzenColumn Size="6">
+        <RadzenButton Style="width: 100%" Text="Neues Spiel" Click="@Button1Click"></RadzenButton>
+    </RadzenColumn>
+<RadzenColumn Size="6">
+<RadzenButton Style="width: 100%" Text="Neues Training" Click="@Button1Click">
+</RadzenButton>
+</RadzenColumn>
+</RadzenRow>
+<RadzenRow Gap="5" RowGap="5">
+    <RadzenColumn>
+        <RadzenRow></RadzenRow>
+        <RadzenDataGrid TItem="dynamic" DoesNotContainText="Keine Daten"></RadzenDataGrid>
+    </RadzenColumn>
+</RadzenRow>
+<RadzenRow></RadzenRow>
+<RadzenRow>
+    <RadzenColumn Size="6">
+        <RadzenLabel Text="Average" />
+        <RadzenChart></RadzenChart>
+    </RadzenColumn>
+<RadzenColumn Size="6">
+    <RadzenLabel Text="Letzte Averages" />
+    <RadzenDataList TItem="dynamic"></RadzenDataList>
+</RadzenColumn>
+</RadzenRow>
+<RadzenRow>
+    <RadzenLabel Text="Automatische Erkennung" />
+</RadzenRow>
+<RadzenRow>
+    <RadzenColumn Size="6">
+        <RadzenButton Style="width: 100%" Text="Erkennung Starten"></RadzenButton>
+    </RadzenColumn>
+<RadzenColumn Size="6">
+    <RadzenButton Style="width: 100%" Text="Erkennung Stoppen"></RadzenButton>
+</RadzenColumn>
+</RadzenRow>
+<RadzenRow>
+    <RadzenColumn Size="4">
+        <RadzenLabel Text="Bild der letzten Erkennung:" Style="width: 100%" />
+        <RadzenImage Style="width: 100%"></RadzenImage>
+    </RadzenColumn>
+<RadzenColumn Size="4">
+    <RadzenLabel Text="Letzte Erkennung" />
+</RadzenColumn>
+<RadzenColumn Size="4">
+    <RadzenLabel Text="Wert:" />
+</RadzenColumn>
+</RadzenRow>
