@@ -11,16 +11,19 @@
   width: 100%;  
   height: 60px;  
   margin: 5px;  
-  box-sizing: border-box;  
   background: #ecedef;  
   border: none;  
   font-size: 30px;  
   line-height: 30px;  
-  border-radius: 10%;  
+  border-radius: 10px;  
   font-weight: 700;  
   color: #235558;  
   cursor: pointer;    
 }  
+input[type=button]:hover{
+    background: #a4a4a7; 
+    transition: 200ms;
+}
 .wurf{
     width: 15%; 
     font-size: 20px;  
@@ -55,6 +58,16 @@
     font-weight: 100; 
     text-align: right; 
 }
+.center {
+  margin: auto;
+  margin-top: 5%;
+  width: 40%;
+  padding: 10px;
+}
+.spieler {
+  margin-top: 0px;
+  padding: 0px;
+}
 </style>
 
 <script>
@@ -83,12 +96,13 @@
                 wert = wert * 2;
             }
         }
+        
        if(spieler){
             var wurf_id = "wurf1" + wurf_nr;
             
             if(checkWinning(wert,double,punkteGesamtSpieler1)){
                 document.getElementsByClassName("spieler1")[0].style.backgroundColor = "green";
-                alert("Spieler2 gewinnt");
+                alert("Spieler1 gewinnt");
                 winner = true;
                 würfeSpieler1 += 1;
             }else{
@@ -97,6 +111,7 @@
                 }else{
                     punkteGesamtSpieler1 -= wert;
                     würfeSpieler1 += 1;
+
                 }
                 winner = false;
             }
@@ -131,12 +146,17 @@
         wurf_nr = 0;
         
         spieler = !spieler;
+        oldvalues1 = [];
+        oldvalues2 = [];
         for(var i = 1; i < 4; i++){
             if(spieler){
                 var wurf_id = "wurf1" + i;
+                oldvalues1.push(document.getElementById(wurf_id).value);
             }else{
                 var wurf_id = "wurf2" + i;
+                oldvalues2.push(document.getElementById(wurf_id).value);
             }
+            //oldvalues.push(document.getElementById(wurf_id).value);
             document.getElementById(wurf_id).value = "";
         }
        }
@@ -182,6 +202,12 @@
             nodes[i].disabled = true;
         }
     }
+    function enableAllButtons(){
+        var nodes = document.getElementById("calcu").getElementsByTagName('*');
+        for(var i = 0; i < nodes.length; i++){
+            nodes[i].disabled = false;
+        }
+    }
 
     function setDouble(){
         double = true;
@@ -210,10 +236,38 @@
     }
 
     function spielStarten(){
+        enableAllButtons();
+        wurf_nr = 0;
+        punkteGesamtSpieler1 = 501;
+        punkteGesamtSpieler2 = 501;
+        würfeSpieler1 = 0;
+        würfeSpieler2 = 0;
+        wurf = [];
+        spieler = true;
+        document.getElementById("debugWurfNr").value = wurf_nr;
+        double = false;
+        triple = false;
+        winner = false;
+        überworfen = false;
+        first = true;
+        for(var i = 1; i < 4; i++){
+            wurf_id = "wurf1" + i;
+            wurf_id2 = "wurf2" + i;
+            document.getElementById(wurf_id).value = "";
+            document.getElementById(wurf_id2).value = "";
+        }
+
+
         document.getElementById("punkteSpieler1").value = punkteGesamtSpieler1;
         document.getElementById("punkteSpieler2").value = punkteGesamtSpieler2;
         document.getElementsByClassName("spieler1")[0].style.backgroundColor = "#bfe0c4";
         document.getElementsByClassName("spieler2")[0].style.backgroundColor = "#ecedef";
+        document.getElementById("avgSpieler1").value = "";
+        document.getElementById("avgSpieler2").value = "";
+        document.getElementById("double").style.backgroundColor = "#ecedef";
+        document.getElementById("triple").style.backgroundColor = "#ecedef";
+        document.getElementById("bull").disabled = false;
+            document.getElementById("bull").style.backgroundColor = "#ecedef";
     }
 
     function writePunktestand(){
@@ -234,6 +288,9 @@
             var rounded = Number(roundedString);
             document.getElementById("avgSpieler1").value = rounded;
 
+        }else{
+            document.getElementById("avgSpieler1").value = "";
+
         }
         if (würfeSpieler2 > 0){
             var avgSpieler2 = (501-punkteGesamtSpieler2)/würfeSpieler2;
@@ -241,7 +298,79 @@
             var roundedString = num.toFixed(2);
             var rounded = Number(roundedString);
             document.getElementById("avgSpieler2").value = rounded;
+        }else{
+            document.getElementById("avgSpieler2").value = "";
+
         }
+    }
+
+    function writeOldValues(){
+        for(var i = 1; i < 4; i++){
+            if(spieler){
+                wurf_id = "wurf1" + i;
+                document.getElementById(wurf_id).value = Number(oldvalues[i]);
+            }else{
+                wurf_id = "wurf2" + i;
+                document.getElementById(wurf_id).value = Number(oldvalues[i]);
+            }
+        }
+    }
+
+    function wurfZurück(){
+
+        if(punkteGesamtSpieler1 == 501 && punkteGesamtSpieler2 == 501){
+            spielStarten();
+            return;
+        }
+
+
+        if(wurf_nr == 3 || wurf_nr == 0){
+            //if würfeSpieler1 > 0 && würfeSpieler2 > 0
+            spieler = !spieler;
+        }
+        if(wurf_nr == 0){
+            wurf_nr = 3;
+            //writeOldValues();
+
+        }
+
+
+        if(spieler){
+            //spieler 1
+            if(punkteGesamtSpieler1 == 501){
+                
+            }else{
+                würfeSpieler1 -= 1;
+                wurf_id = "wurf1" + wurf_nr;
+                
+                punkteGesamtSpieler1 += Number(document.getElementById(wurf_id).value);
+            }
+
+
+        }else{
+            //spieler 2
+            if(punkteGesamtSpieler2 == 501){
+                
+            }else{
+                würfeSpieler2 -= 1;
+                wurf_id = "wurf2" + wurf_nr;
+                
+                punkteGesamtSpieler2 += Number(document.getElementById(wurf_id).value);
+            }
+        }
+        wurf_nr -= 1;
+        document.getElementById("debugWurfNr").value = wurf_nr;
+        document.getElementById(wurf_id).value = "";
+        writePunktestand();
+        writeAvg();
+        if(spieler){
+                document.getElementsByClassName("spieler1")[0].style.backgroundColor = "#bfe0c4";
+                document.getElementsByClassName("spieler2")[0].style.backgroundColor = "#ecedef";
+
+            }else{
+                document.getElementsByClassName("spieler2")[0].style.backgroundColor = "#bfe0c4";
+                document.getElementsByClassName("spieler1")[0].style.backgroundColor = "#ecedef";
+            }
     }
 
 </script>
@@ -249,26 +378,28 @@
 </head>
 <body>
     <h1>X501-Match</h1>
-    Spieler an der Reihe (true, false) == (Spieler1, Spieler2) <input type="text" readonly id="debugSpieler"><br>
-    Anzahl der gespielten Würfe in dieser Aufnahme <input type="text" readonly id="debugWurfNr"><br><input class="punktstand" type="text" readonly id="debug">
+    <div style="display: none;">
+        Spieler an der Reihe (true, false) == (Spieler1, Spieler2) <input type="text" readonly id="debugSpieler"><br>
+        Anzahl der gespielten Würfe in dieser Aufnahme <input type="text" readonly id="debugWurfNr"><br><input class="punktstand" type="text" readonly id="debug">
+    </div>
     <input type="button" value="Spiel Starten" onclick="spielStarten()">
-    <div class="spieler1">
-        <h2>Spieler1</h2>
+    <div class="spieler1 spieler">
+        Spieler1<br>
         Punktestand:
         <input class="punktstand" type="text" readonly id="punkteSpieler1"> Avg.: <input class="average" type="text" readonly id="avgSpieler1"><br>
         1:<input class="wurf" type="text" readonly id="wurf11">
         2:<input class="wurf" type="text" readonly id="wurf12">
         3:<input class="wurf" type="text" readonly id="wurf13">
     </div>
-    <div class="spieler2">
-        <h2>Spieler2</h2>
+    <div class="spieler2 spieler">
+        Spieler2<br>
         Punktestand:
         <input class="punktstand" type="text" readonly id="punkteSpieler2"> Avg.: <input class="average" type="text" readonly id="avgSpieler2"><br>
         1:<input class="wurf" type="text" readonly id="wurf21">
         2:<input class="wurf" type="text" readonly id="wurf22">
         3:<input class="wurf" type="text" readonly id="wurf23">
     </div>
-    <div >
+    <div class="center">
         <table id="calcu" width="100%">
             <tr>
                 <td><input type="button" value="1" onclick="calcWurfNr(this)"></td>
@@ -299,10 +430,10 @@
                 <td><input type="button" value="25" onclick="calcWurfNr(this)" id="bull"></td>
             </tr>
             <tr>
-                <td><input type="button" value="0"></td>
+                <td><input type="button" value="0" onclick="calcWurfNr(this)"></td>
                 <td colspan="2"><input type="button" value="Double" onclick="setDouble()" id="double"></td>
                 <td colspan="2"><input type="button" value="Triple" onclick="setTriple()" id="triple"></td>
-                <td colspan="2"><input type="button" value="Zurück"></td>
+                <td colspan="2"><input type="button" value="Zurück" onclick="wurfZurück()"></td>
             </tr>
         </table>
     </div>
