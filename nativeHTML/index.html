@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dart Dashboard</title>
+
+<style>
+    input[type=button] {  
+  width: 100%;  
+  height: 60px;  
+  margin: 5px;  
+  box-sizing: border-box;  
+  background: #ecedef;  
+  border: none;  
+  font-size: 30px;  
+  line-height: 30px;  
+  border-radius: 10%;  
+  font-weight: 700;  
+  color: #235558;  
+  cursor: pointer;    
+}  
+.wurf{
+    width: 15%; 
+    font-size: 20px;  
+    border-radius: 10%; 
+    box-sizing: border-box;
+    background: none;
+    line-height: 0px;  
+    border: none; 
+    font-weight: 100; 
+    text-align: center; 
+}
+.punktstand{
+    font-size: 30px; 
+    width: 20%;  
+    text-align: center;
+    border-radius: 10%; 
+    box-sizing: border-box;
+    color: #235558;   
+    line-height: 0px;  
+    font-weight: 1000; 
+    border: none;  
+    background: none;
+}
+.average{
+    width: 15%; 
+    font-size: 20px;  
+    border-radius: 10%; 
+    box-sizing: border-box;
+    background: none;
+    line-height: 0px;  
+    border: none; 
+    font-weight: 100; 
+    text-align: right; 
+}
+</style>
+
+<script>
+    var wurf_nr = 0;
+    var punkteGesamtSpieler1 = 501;
+    var punkteGesamtSpieler2 = 501;
+    var würfeSpieler1 = 0;
+    var würfeSpieler2 = 0;
+    var spieler = true;
+    document.getElementById("debugWurfNr").value = wurf_nr;
+    var double = false;
+    var triple = false;
+    var winner = false;
+    var überworfen = false;
+    var first = true;
+    function calcWurfNr(object) {
+       wurf_nr = wurf_nr + 1; 
+       überworfen = false;
+       document.getElementById("debugWurfNr").value = wurf_nr;
+
+        var wert = object.value;
+        if(triple){
+            wert = wert * 3;
+        }else{
+            if(double){
+                wert = wert * 2;
+            }
+        }
+       if(spieler){
+            var wurf_id = "wurf1" + wurf_nr;
+            
+            if(checkWinning(wert,double,punkteGesamtSpieler1)){
+                document.getElementsByClassName("spieler1")[0].style.backgroundColor = "green";
+                alert("Spieler2 gewinnt");
+                winner = true;
+                würfeSpieler1 += 1;
+            }else{
+                if(punkteGesamtSpieler1 - wert < 2){
+                    überworfen = true;
+                }else{
+                    punkteGesamtSpieler1 -= wert;
+                    würfeSpieler1 += 1;
+                }
+                winner = false;
+            }
+       }else{
+        var wurf_id = "wurf2" + wurf_nr;
+        
+            if(checkWinning(wert,double,punkteGesamtSpieler2)){
+                document.getElementsByClassName("spieler2")[0].style.backgroundColor = "green";
+                alert("Spieler2 gewinnt");
+                winner = true;
+                würfeSpieler2 += 1;
+            }else{
+                if(punkteGesamtSpieler2 - wert < 2){
+                    überworfen = true;
+                }else{
+                    punkteGesamtSpieler2 -= wert;
+                    würfeSpieler2 += 1;
+                }
+                winner = false;
+            }
+       }
+       
+       document.getElementById("debugWurfNr").value = wurf_nr;
+
+       document.getElementById(wurf_id).value = wert;
+       if(überworfen){
+        document.getElementById(wurf_id).style.color = "red";
+       }else{
+        writeAvg();
+       }
+       if(wurf_nr == 3 || überworfen){
+        wurf_nr = 0;
+        
+        spieler = !spieler;
+        for(var i = 1; i < 4; i++){
+            if(spieler){
+                var wurf_id = "wurf1" + i;
+            }else{
+                var wurf_id = "wurf2" + i;
+            }
+            document.getElementById(wurf_id).value = "";
+        }
+       }
+       writePunktestand();
+       writeAvg();
+       if(winner == false){
+            document.getElementById("bull").disabled = false;
+                document.getElementById("bull").style.backgroundColor = "#ecedef";
+            document.getElementById("debugSpieler").value = spieler;
+            if(spieler){
+                document.getElementsByClassName("spieler1")[0].style.backgroundColor = "#bfe0c4";
+                document.getElementsByClassName("spieler2")[0].style.backgroundColor = "#ecedef";
+
+            }else{
+                document.getElementsByClassName("spieler2")[0].style.backgroundColor = "#bfe0c4";
+                document.getElementsByClassName("spieler1")[0].style.backgroundColor = "#ecedef";
+            }
+            
+            //writeBackgroundColor();
+            double = false;
+            triple = false;
+            document.getElementById("double").style.backgroundColor = "#ecedef";
+            document.getElementById("triple").style.backgroundColor = "#ecedef";
+        }else{
+            afterWinningDisableAllButtons();
+        }
+    }
+
+    function checkWinning(wertWurf,doubleOut,restwert){
+        document.getElementById("debug").value = restwert-wertWurf;
+        if(restwert-wertWurf == 0 && doubleOut){
+            console.log("gewonnen");
+            return true;
+        }else{
+            console.log("nicht gewonnen");
+            return false;
+        }
+    }
+
+    function afterWinningDisableAllButtons(){
+        var nodes = document.getElementById("calcu").getElementsByTagName('*');
+        for(var i = 0; i < nodes.length; i++){
+            nodes[i].disabled = true;
+        }
+    }
+
+    function setDouble(){
+        double = true;
+        triple = false;
+        document.getElementById("double").style.backgroundColor = "red";
+        document.getElementById("triple").style.backgroundColor = "#ecedef";
+
+    }
+    function setTriple(){
+        if(!triple){
+            triple = true;
+            double = false;
+            document.getElementById("double").style.backgroundColor = "#ecedef";
+            document.getElementById("triple").style.backgroundColor = "red";
+            document.getElementById("bull").disabled = true;
+            document.getElementById("bull").style.backgroundColor = "#3d3d3d";
+        }else{
+            triple = false;
+            document.getElementById("double").style.backgroundColor = "#ecedef";
+            document.getElementById("triple").style.backgroundColor = "#ecedef";
+            document.getElementById("bull").disabled = false;
+            document.getElementById("bull").style.backgroundColor = "#ecedef";
+        }
+
+
+    }
+
+    function spielStarten(){
+        document.getElementById("punkteSpieler1").value = punkteGesamtSpieler1;
+        document.getElementById("punkteSpieler2").value = punkteGesamtSpieler2;
+        document.getElementsByClassName("spieler1")[0].style.backgroundColor = "#bfe0c4";
+        document.getElementsByClassName("spieler2")[0].style.backgroundColor = "#ecedef";
+    }
+
+    function writePunktestand(){
+        document.getElementById("punkteSpieler1").value = punkteGesamtSpieler1;
+        document.getElementById("punkteSpieler2").value = punkteGesamtSpieler2;
+
+    }
+    function writeBackgroundColor(){
+        document.getElementsByClassName("spieler1")[0].style.backgroundColor = "#bfe0c4";
+        document.getElementsByClassName("spieler2")[0].style.backgroundColor = "#ecedef";
+      }
+
+    function writeAvg(){
+        if (würfeSpieler1 > 0){
+            var avgSpieler1 = (501-punkteGesamtSpieler1)/würfeSpieler1;
+            var num = Number(avgSpieler1) // The Number() only visualizes the type and is not needed
+            var roundedString = num.toFixed(2);
+            var rounded = Number(roundedString);
+            document.getElementById("avgSpieler1").value = rounded;
+
+        }
+        if (würfeSpieler2 > 0){
+            var avgSpieler2 = (501-punkteGesamtSpieler2)/würfeSpieler2;
+            var num = Number(avgSpieler2) // The Number() only visualizes the type and is not needed
+            var roundedString = num.toFixed(2);
+            var rounded = Number(roundedString);
+            document.getElementById("avgSpieler2").value = rounded;
+        }
+    }
+
+</script>
+
+</head>
+<body>
+    <h1>X501-Match</h1>
+    Spieler an der Reihe (true, false) == (Spieler1, Spieler2) <input type="text" readonly id="debugSpieler"><br>
+    Anzahl der gespielten Würfe in dieser Aufnahme <input type="text" readonly id="debugWurfNr"><br><input class="punktstand" type="text" readonly id="debug">
+    <input type="button" value="Spiel Starten" onclick="spielStarten()">
+    <div class="spieler1">
+        <h2>Spieler1</h2>
+        Punktestand:
+        <input class="punktstand" type="text" readonly id="punkteSpieler1"> Avg.: <input class="average" type="text" readonly id="avgSpieler1"><br>
+        1:<input class="wurf" type="text" readonly id="wurf11">
+        2:<input class="wurf" type="text" readonly id="wurf12">
+        3:<input class="wurf" type="text" readonly id="wurf13">
+    </div>
+    <div class="spieler2">
+        <h2>Spieler2</h2>
+        Punktestand:
+        <input class="punktstand" type="text" readonly id="punkteSpieler2"> Avg.: <input class="average" type="text" readonly id="avgSpieler2"><br>
+        1:<input class="wurf" type="text" readonly id="wurf21">
+        2:<input class="wurf" type="text" readonly id="wurf22">
+        3:<input class="wurf" type="text" readonly id="wurf23">
+    </div>
+    <div >
+        <table id="calcu" width="100%">
+            <tr>
+                <td><input type="button" value="1" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="2" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="3" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="4" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="5" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="6" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="7" onclick="calcWurfNr(this)"></td>
+
+            </tr>
+            <tr>
+                <td><input type="button" value="8" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="9" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="10" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="11" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="12" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="13" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="14" onclick="calcWurfNr(this)"></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="15" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="16" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="17" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="18" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="19" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="20" onclick="calcWurfNr(this)"></td>
+                <td><input type="button" value="25" onclick="calcWurfNr(this)" id="bull"></td>
+            </tr>
+            <tr>
+                <td><input type="button" value="0"></td>
+                <td colspan="2"><input type="button" value="Double" onclick="setDouble()" id="double"></td>
+                <td colspan="2"><input type="button" value="Triple" onclick="setTriple()" id="triple"></td>
+                <td colspan="2"><input type="button" value="Zurück"></td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>
