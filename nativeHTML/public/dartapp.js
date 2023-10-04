@@ -1,4 +1,7 @@
 
+
+
+var first = true;
 //const db = new sqlite3.Database('./database/darts.sqlite');
 var wurf_nr = 0;
     var punkteGesamtSpieler1 = 501;
@@ -11,23 +14,9 @@ var wurf_nr = 0;
     var triple = false;
     var winner = false;
     var überworfen = false;
-    var first = true;
-   
 
-    function getFromDB(){
-        //import * as sqlite3 from '.\\node_modules\\sqlite3\\lib\\sqlite3';
-        const sqlite3 = require(['.\\node_modules\\sqlite3\\lib\\sqlite3']);
-        let db = new sqlite3.Database('./database/darts.db', (err) => {
-            if (err) {
-              console.error(err.message);
-            }
-            console.log('Connected to the chinook database.');
-          });
-        //const sqlite3 = require('sqlite3');
-        //const db = new sqlite3.Database('database\\darts.db');
-        //var temp = db.get("SELECT * FROM dart_game");
-        document.getElementById("debug").value = "test";
-    }
+
+
 
 
     function writeToDB(){

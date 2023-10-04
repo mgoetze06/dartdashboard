@@ -5,16 +5,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dart Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="require.js"></script>
-    <script src="dartapp.js"></script>    
+    <link type="text/css" rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="dartapp.js"></script>    
 </head>
 <body>
     <h1>X501-Match</h1>
     <div style="display: block;">
         Spieler an der Reihe (true, false) == (Spieler1, Spieler2) <input type="text" readonly id="debugSpieler"><br>
         Anzahl der gespielten Würfe in dieser Aufnahme <input type="text" readonly id="debugWurfNr"><br><input class="punktstand" type="text" readonly id="debug">
-        <input type="button" value="from DB" onclick="getFromDB()">
+        <input type="button" value="from DB" onclick="createDbConnection()">
         <input type="text" readonly id="debug">
     </div>
     <input type="button" value="Spiel Starten" onclick="spielStarten()">
