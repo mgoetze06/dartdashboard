@@ -8,7 +8,14 @@ const myInput = document.getElementById("message")
 const sendBtn = document.getElementById("send")
 
 sendBtn.disabled = true
-sendBtn.addEventListener("click", sendMsg, false)
+//sendBtn.addEventListener("click", sendMsg, false)
+
+
+function sendMsgWithValue(object){
+    mywsServer.send(object.innerText)
+
+}
+
 
 //Sending message from client
 function sendMsg() {
