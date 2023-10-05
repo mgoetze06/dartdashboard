@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Flask-Sock Demo</title>
+  </head>
+  <body>
+    <h1>Flask-Sock Demo</h1>
+    <div id="log"></div>
+    <br>
+    <form id="form">
+      <label for="text">Input: </label>
+      <input type="text" id="text" autofocus>
+    </form>
+
+    <button style="width: 100%; height: 40px;" onclick="sendData()">Einzeln</button>
+    <button style="width: 100%; height: 40px;" onclick="sendBroadcast()">Alle</button>
+    <input type="text" readonly id="textBox">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+  <script type="text/javascript" charset="utf-8">
+    var socket = io();
+
+    var counter = 1;
+    socket.on('my response', function(msg) {
+      //$('#textBox').append('<p>Received: ' + msg.data + '</p>');
+      console.log(msg.data);
+      document.getElementById('textBox').value = msg.data;
+      
+    });
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
+
+  function sendData(){
+    socket.emit('message', {data: 'I\'m connected!'});
+
+  }
+  function sendBroadcast(){
+    counter++;
+    socket.emit('my broadcast event', {data: counter});
+
+  }
+
+  </script>
+
+  </body>
+</html>
