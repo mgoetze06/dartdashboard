@@ -56,18 +56,20 @@ def test_message(message):
     connection = sqlite3.connect(database_path)
 
     cursor = connection.cursor()
-    spieler = "Spieler1"
-    cursor.execute("UPDATE dartgame SET punkte =  " + str(message['data']) + " WHERE spieler = '"+ spieler + "' ;")
+    spieler = "Spieler2"
+    query = "UPDATE dartgame SET punkte =  " + str(message['data']) + " WHERE spieler = '"+ spieler + "' ;"
+    print(query)
+    cursor.execute(query)
     connection.commit()
 
     alle_spieler = ["Spieler1","Spieler2"]
     for spieler in alle_spieler:
-        print(spieler)
+        #print(spieler)
         cursor.execute("select punkte from dartgame where spieler = '"+spieler+"'")
         wert = cursor.fetchone()[0]
         #print(cursor.fetchone()[0])
-    print('received broadcast message')
-    #print(message["data"])
+    print('Spieler2: ')
+    print(wert)
     emit('my response', {'data': wert}, broadcast=True)
     connection.close()
     #emit('my response', {'data': message["data"]}, broadcast=True)
