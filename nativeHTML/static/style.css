@@ -1,0 +1,74 @@
+input[type=button] {  
+    width: 100%;   
+    height: 120px;
+    margin: 5px;  
+    background: #ecedef;  
+    border: none;  
+    font-size: 30px;  
+    line-height: 30px;  
+    border-radius: 10px;  
+    font-weight: 700;  
+    color: #235558;  
+    cursor: pointer;    
+  } 
+  @media (hover: hover) {
+    input[type=button]:hover{
+        background: #a4a4a7; 
+        transition: 200ms;
+    }
+}
+  .wurf{
+      width: 15%; 
+      font-size: 20px;  
+      border-radius: 10%; 
+      box-sizing: border-box;
+      background: none;
+      line-height: 0px;  
+      border: none; 
+      font-weight: 100; 
+      text-align: center; 
+  }
+  .punktstand{
+      font-size: 120px; 
+      width: 40%;  
+      text-align: center;
+      border-radius: 10%; 
+      box-sizing: border-box;
+      color: #235558;   
+      line-height: 0px;  
+      font-weight: 1000; 
+      border: none;  
+      background: none;
+  }
+  .average{
+      width: 15%; 
+      font-size: 20px;  
+      border-radius: 10%; 
+      box-sizing: border-box;
+      background: none;
+      line-height: 0px;  
+      border: none; 
+      font-weight: 100; 
+      text-align: right; 
+  }
+  #center {
+    margin: auto;
+    margin-top: 5%;
+    height: 60%;
+    width: 40%;
+    }
+  @media (max-width: 1100px) {
+    #center {
+
+      width: 100%;
+      }
+      input[type=button] {  
+        height: 250px;
+        font-size: xx-large;
+      }
+  }
+
+  .spieler {
+    margin-top: 0px;
+    padding: 0px;
+  }
