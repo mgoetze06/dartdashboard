@@ -68,6 +68,8 @@
       3:<input class="wurf" type="text" readonly id="wurf23">
   </div>
   <div id="center">
+    <input type="text" id="PunktEingabeFrei">
+    <input type="button" value="Eingabe" onclick="sendWurf(document.getElementById('PunktEingabeFrei').value)">
       <table id="calcu" width="100%">
           <tr>
               <td><input type="button" value="1" onclick="sendWurf(this)"></td>
