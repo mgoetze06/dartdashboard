@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Flask-Sock Demo</title>
+    <title>albs-dart</title>
     <link rel="stylesheet" type="text/css" href="/static/style.css">
   </head>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
@@ -27,6 +27,9 @@
 
   function sendWurf(object){
     socket.emit('wurf', {data: object.value});
+    //var snd = new Audio("file.wav");
+    //snd.play();
+    document.getElementById('sound1').play();
   }
 
   function sendBroadcast(){
@@ -46,6 +49,7 @@
       Spieler an der Reihe (true, false) == (Spieler1, Spieler2) <input type="text" readonly id="debugSpieler"><br>
       Anzahl der gespielten Würfe in dieser Aufnahme <input type="text" readonly id="debugWurfNr"><br><input class="punktstand" type="text" readonly id="debug">
   </div>
+  <audio id="sound1" src="/static/26.wav" preload="auto"></audio>
   <input type="button" value="Spiel Starten" onclick="sendBroadcast()">
   <div class="spieler1 spieler">
       Spieler1<br>
