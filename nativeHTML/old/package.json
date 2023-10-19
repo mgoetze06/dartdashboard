@@ -1,0 +1,16 @@
+{
+  "name": "sqlite",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dartapp.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "MG",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "require": "^0.4.4",
+    "sqlite3": "^5.1.6"
+  }
+}

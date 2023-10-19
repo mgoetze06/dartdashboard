@@ -1,88 +1,28 @@
-<!DOCTYPE html>
-<html lang="de">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dart Dashboard</title>
 
-<style>
-    input[type=button] {  
-  width: 100%;  
-  height: 60px;  
-  margin: 5px;  
-  background: #ecedef;  
-  border: none;  
-  font-size: 30px;  
-  line-height: 30px;  
-  border-radius: 10px;  
-  font-weight: 700;  
-  color: #235558;  
-  cursor: pointer;    
-}  
-input[type=button]:hover{
-    background: #a4a4a7; 
-    transition: 200ms;
-}
-.wurf{
-    width: 15%; 
-    font-size: 20px;  
-    border-radius: 10%; 
-    box-sizing: border-box;
-    background: none;
-    line-height: 0px;  
-    border: none; 
-    font-weight: 100; 
-    text-align: center; 
-}
-.punktstand{
-    font-size: 30px; 
-    width: 20%;  
-    text-align: center;
-    border-radius: 10%; 
-    box-sizing: border-box;
-    color: #235558;   
-    line-height: 0px;  
-    font-weight: 1000; 
-    border: none;  
-    background: none;
-}
-.average{
-    width: 15%; 
-    font-size: 20px;  
-    border-radius: 10%; 
-    box-sizing: border-box;
-    background: none;
-    line-height: 0px;  
-    border: none; 
-    font-weight: 100; 
-    text-align: right; 
-}
-.center {
-  margin: auto;
-  margin-top: 5%;
-  width: 40%;
-  padding: 10px;
-}
-.spieler {
-  margin-top: 0px;
-  padding: 0px;
-}
-</style>
 
-<script>
-    var wurf_nr = 0;
+var first = true;
+//const db = new sqlite3.Database('./database/darts.sqlite');
+var wurf_nr = 0;
     var punkteGesamtSpieler1 = 501;
     var punkteGesamtSpieler2 = 501;
     var würfeSpieler1 = 0;
     var würfeSpieler2 = 0;
     var spieler = true;
-    document.getElementById("debugWurfNr").value = wurf_nr;
+    //document.getElementById("debugWurfNr").value = wurf_nr;
     var double = false;
     var triple = false;
     var winner = false;
     var überworfen = false;
-    var first = true;
+
+
+
+
+
+    function writeToDB(){
+        //db.run('UPDATE dart_game
+    }
+
     function calcWurfNr(object) {
        wurf_nr = wurf_nr + 1; 
        überworfen = false;
@@ -372,71 +312,3 @@ input[type=button]:hover{
                 document.getElementsByClassName("spieler1")[0].style.backgroundColor = "#ecedef";
             }
     }
-
-</script>
-
-</head>
-<body>
-    <h1>X501-Match</h1>
-    <div style="display: none;">
-        Spieler an der Reihe (true, false) == (Spieler1, Spieler2) <input type="text" readonly id="debugSpieler"><br>
-        Anzahl der gespielten Würfe in dieser Aufnahme <input type="text" readonly id="debugWurfNr"><br><input class="punktstand" type="text" readonly id="debug">
-    </div>
-    <input type="button" value="Spiel Starten" onclick="spielStarten()">
-    <div class="spieler1 spieler">
-        Spieler1<br>
-        Punktestand:
-        <input class="punktstand" type="text" readonly id="punkteSpieler1"> Avg.: <input class="average" type="text" readonly id="avgSpieler1"><br>
-        1:<input class="wurf" type="text" readonly id="wurf11">
-        2:<input class="wurf" type="text" readonly id="wurf12">
-        3:<input class="wurf" type="text" readonly id="wurf13">
-    </div>
-    <div class="spieler2 spieler">
-        Spieler2<br>
-        Punktestand:
-        <input class="punktstand" type="text" readonly id="punkteSpieler2"> Avg.: <input class="average" type="text" readonly id="avgSpieler2"><br>
-        1:<input class="wurf" type="text" readonly id="wurf21">
-        2:<input class="wurf" type="text" readonly id="wurf22">
-        3:<input class="wurf" type="text" readonly id="wurf23">
-    </div>
-    <div class="center">
-        <table id="calcu" width="100%">
-            <tr>
-                <td><input type="button" value="1" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="2" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="3" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="4" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="5" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="6" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="7" onclick="calcWurfNr(this)"></td>
-
-            </tr>
-            <tr>
-                <td><input type="button" value="8" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="9" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="10" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="11" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="12" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="13" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="14" onclick="calcWurfNr(this)"></td>
-            </tr>
-            <tr>
-                <td><input type="button" value="15" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="16" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="17" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="18" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="19" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="20" onclick="calcWurfNr(this)"></td>
-                <td><input type="button" value="25" onclick="calcWurfNr(this)" id="bull"></td>
-            </tr>
-            <tr>
-                <td><input type="button" value="0" onclick="calcWurfNr(this)"></td>
-                <td colspan="2"><input type="button" value="Double" onclick="setDouble()" id="double"></td>
-                <td colspan="2"><input type="button" value="Triple" onclick="setTriple()" id="triple"></td>
-                <td colspan="2"><input type="button" value="Zurück" onclick="wurfZurück()"></td>
-            </tr>
-        </table>
-    </div>
-</body>
-
-</html>

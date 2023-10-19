@@ -1,0 +1,61 @@
+input[type=button] {  
+    width: 100%;  
+    height: 60px;  
+    margin: 5px;  
+    background: #ecedef;  
+    border: none;  
+    font-size: 30px;  
+    line-height: 30px;  
+    border-radius: 10px;  
+    font-weight: 700;  
+    color: #235558;  
+    cursor: pointer;    
+  }  
+  input[type=button]:hover{
+      background: #a4a4a7; 
+      transition: 200ms;
+  }
+  .wurf{
+      width: 15%; 
+      font-size: 20px;  
+      border-radius: 10%; 
+      box-sizing: border-box;
+      background: none;
+      line-height: 0px;  
+      border: none; 
+      font-weight: 100; 
+      text-align: center; 
+  }
+  .punktstand{
+      font-size: 30px; 
+      width: 20%;  
+      text-align: center;
+      border-radius: 10%; 
+      box-sizing: border-box;
+      color: #235558;   
+      line-height: 0px;  
+      font-weight: 1000; 
+      border: none;  
+      background: none;
+  }
+  .average{
+      width: 15%; 
+      font-size: 20px;  
+      border-radius: 10%; 
+      box-sizing: border-box;
+      background: none;
+      line-height: 0px;  
+      border: none; 
+      font-weight: 100; 
+      text-align: right; 
+  }
+  .center {
+    margin: auto;
+    margin-top: 5%;
+    width: 40%;
+    padding: 10px;
+  }
+  .spieler {
+    margin-top: 0px;
+    padding: 0px;
+  }
