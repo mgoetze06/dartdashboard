@@ -1,6 +1,3 @@
-Dart Dashboard als lokale Anzeige von Ergebnissen
-<<<<<<< HEAD
-<img src="https://github.com/mgoetze06/DartDashboard/blob/main/images/init.png?raw=true" width="100%">
-=======
-<img src="https://github.com/mgoetze06/dartdashboard/blob/master/images/init.png?raw=true" width="100%">
->>>>>>> 508c357a90cb7bab7412f6c916b82d9f013ca701
+Dart App aus lokaler Webseite und Python-Backend, sowie ESP8266 mit 2 OLED Displays und P
+
+<img src="https://github.com/mgoetze06/dartdashboard/blob/master/images/spielstand2.jpeg?raw=true" width="100%">
