@@ -3,6 +3,13 @@ from flask_socketio import SocketIO, emit
 #!/usr/bin/python
 import sqlite3
 import os,sys
+import requests
+import json
+
+url = "http://192.168.0.214/update"
+data = {'punkte0': '501', 'punkte1': '501', 'spieler': '0'}
+headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
+
 
 file_path = os.path.dirname(os.path.abspath(sys.argv[0]))
 database_path = os.path.join(file_path,"database\\darts.db")
@@ -50,6 +57,9 @@ def handle_message(data):
         wert = cursor.fetchone()[0]
         punktstände.append(wert)
     emit('spielstand_update', {'punktstand1': punktstände[0],'punktstand2': punktstände[1]}, broadcast=True)
+    global url,headers
+    data = {'punkte0': str(punktstände[0]), 'punkte1': str(punktstände[1]), 'spieler': '0'}
+    requests.post(url, data=json.dumps(data), headers=headers)
     connection.close()
 @socketio.on('init event')
 def test_message(message):
@@ -65,6 +75,13 @@ def test_message(message):
         cursor.execute(query)
     connection.commit()
     emit('spielstand_update', {'punktstand1': 501,'punktstand2': 501}, broadcast=True)
+
+
+    global url,headers
+    data = {'punkte0': '501', 'punkte1': '501', 'spieler': '0'}
+    requests.post(url, data=json.dumps(data), headers=headers)
+    
+
     connection.close()
     #emit('my response', {'data': message["data"]}, broadcast=True)
 
