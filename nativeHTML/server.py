@@ -54,6 +54,15 @@ def handle_message(data):
     query = "UPDATE dartgame SET punkte =  " + str(wert)  + " WHERE spieler = '"+ spieler + "' ;"
     print("neue Punktzahl: ",str(wert))
     cursor.execute(query)
+    cursor.execute("select wurfliste from dartgame where spieler = '"+spieler+"'")
+    wert = cursor.fetchone()[0] + ";" + data["data"]
+    query = "UPDATE dartgame SET wurfliste =  '" + str(wert)  + "' WHERE spieler = '"+ spieler + "' ;"
+    print("Wurfliste: ",str(wert))
+    print(wert.split(";")[1:])
+    cursor.execute(query)
+
+
+
     connection.commit()
     alle_spieler = ["Spieler1","Spieler2"]
     punktstände = []
@@ -83,6 +92,9 @@ def test_message(message):
     alle_spieler = ["Spieler1","Spieler2"]
     for spieler in alle_spieler:
         query = "UPDATE dartgame SET punkte = 501 WHERE spieler = '"+ spieler + "' ;"
+        print(query)
+        cursor.execute(query)
+        query = "UPDATE dartgame SET wurfliste = '' WHERE spieler = '"+ spieler + "' ;"
         print(query)
         cursor.execute(query)
     connection.commit()
