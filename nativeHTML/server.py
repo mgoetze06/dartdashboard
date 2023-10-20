@@ -76,7 +76,7 @@ def test_message(message):
     connection.commit()
     emit('spielstand_update', {'punktstand1': 501,'punktstand2': 501}, broadcast=True)
 
-
+#first change
     global url,headers
     data = {'punkte0': '501', 'punkte1': '501', 'spieler': '0'}
     requests.post(url, data=json.dumps(data), headers=headers)
