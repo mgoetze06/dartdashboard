@@ -7,8 +7,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
   <script type="text/javascript" charset="utf-8">
     var socket = io();
-
+    var double = false;
+    var triple = false;
+    var spieler = true;
     var counter = 1;
+    var überworfen = false;
+    var wurf_nr = 0;
     socket.on('spielstand_update', function(msg) {
       //$('#textBox').append('<p>Received: ' + msg.data + '</p>');
       document.getElementById('punkteSpieler1').value = msg.punktstand1;
@@ -23,19 +27,97 @@
     socket.emit('message', {data: 'I\'m connected!'});
 
   }
+  function toggleTriple(){
+    triple = !triple;
+    double = false;
+    ColorsTripleDouble();
+  }
+  function toggleDouble(){
+    double = !double;
+    triple = false;
+    ColorsTripleDouble();
+  }
 
+  function ColorsTripleDouble(){
+    document.getElementById("double").style.backgroundColor = "#ecedef";
+    document.getElementById("triple").style.backgroundColor = "#ecedef";
+    if(double){
+      document.getElementById("double").style.backgroundColor = "red";
+    }
+    if(triple){
+      document.getElementById("triple").style.backgroundColor = "red";
+    }
 
+  }
+
+  function checkWinning(wertWurf,doubleOut,restwert){
+      //document.getElementById("debug").value = restwert-wertWurf;
+      if(restwert-wertWurf == 0 && doubleOut){
+          console.log("gewonnen");
+          return true;
+      }else{
+          console.log("nicht gewonnen");
+          return false;
+      }
+  }
   function sendWurf(object){
-    socket.emit('wurf', {data: object.value});
-    //var snd = new Audio("file.wav");
-    //snd.play();
-    document.getElementById('sound1').play();
+
+    var wert = object.value;
+    wurf_nr = wurf_nr + 1; 
+    überworfen = false;
+    if(triple){
+        wert = wert * 3;
+    }else{
+        if(double){
+            wert = wert * 2;
+        }
+    }
+
+    if(spieler){
+      currentPunktstand = document.getElementById('punkteSpieler1').value
+      currentSpieler = "Spieler1";
+      andererSpieler = "Spieler2";
+
+
+    }else{
+      currentPunktstand = document.getElementById('punkteSpieler2').value
+      currentSpieler = "Spieler2";
+      andererSpieler = "Spieler1";
+    }
+    if(checkWinning(wert,double,currentPunktstand)){
+        document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "green";
+        var winningText = currentSpieler + " gewinnt!";
+        alert(winningText);
+    }else{
+      if(currentPunktstand - wert < 2){
+                    überworfen = true;
+      }else{
+          socket.emit('wurf', {data: wert, currentSpieler: currentSpieler});
+      }
+      winner = false;
+    }
+    if(wurf_nr == 3 || überworfen){
+      spieler = !spieler;
+      wurf_nr = 0;
+      document.getElementsByClassName(andererSpieler)[0].style.backgroundColor = "#bfe0c4";
+      document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "#ecedef";
+    }else{
+      document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "#bfe0c4";
+      document.getElementsByClassName(andererSpieler)[0].style.backgroundColor = "#ecedef";
+    }
+    document.getElementById('PunktEingabeFrei').value = "";
+    triple = false;
+    double = false;
+    ColorsTripleDouble();
+    //document.getElementById('sound1').play();
   }
 
   function sendBroadcast(){
     counter++;
     socket.emit('init event', {data: counter});
-
+    document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
+    document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#ecedef";
+    document.getElementById('PunktEingabeFrei').value = "";
   }
 
   </script>
@@ -44,14 +126,16 @@
 
 
 <body>
-  <h1>X501-Match</h1>
+  <!--<h1>X501-Match</h1> -->
   <div style="display: none;">
       Spieler an der Reihe (true, false) == (Spieler1, Spieler2) <input type="text" readonly id="debugSpieler"><br>
       Anzahl der gespielten Würfe in dieser Aufnahme <input type="text" readonly id="debugWurfNr"><br><input class="punktstand" type="text" readonly id="debug">
   </div>
   <audio id="sound1" src="/static/26.wav" preload="auto"></audio>
-  <input type="button" value="Spiel Starten" onclick="sendBroadcast()">
-  <div class="spieler1 spieler">
+  <div style="width: 20%; height: 25px;">
+    <input value="Spiel Starten" type="button" onclick="sendBroadcast()">
+  </div>
+  <div class="Spieler1 spieler">
       Spieler1<br>
       Punktestand:
       <input class="punktstand" type="text" readonly id="punkteSpieler1"> Avg.: <input class="average" type="text" readonly id="avgSpieler1"><br>
@@ -59,7 +143,7 @@
       2:<input class="wurf" type="text" readonly id="wurf12">
       3:<input class="wurf" type="text" readonly id="wurf13">
   </div>
-  <div class="spieler2 spieler">
+  <div class="Spieler2 spieler">
       Spieler2<br>
       Punktestand:
       <input class="punktstand" type="text" readonly id="punkteSpieler2"> Avg.: <input class="average" type="text" readonly id="avgSpieler2"><br>
@@ -68,42 +152,49 @@
       3:<input class="wurf" type="text" readonly id="wurf23">
   </div>
   <div id="center">
-    <input type="text" id="PunktEingabeFrei">
-    <input type="button" value="Eingabe" onclick="sendWurf(document.getElementById('PunktEingabeFrei').value)">
+    <table width="100%">
+      <tr>
+        <td style="background: grey;">
+          <input class="normalButton" style="width: 20%; background: white;color: black;  "type="text" id="PunktEingabeFrei">
+          <input class="normalButton" style="width:40%;" type="button" value="Eingabe" onclick="sendWurf(document.getElementById('PunktEingabeFrei'))">
+        </td>
+        <td><input class="normalButton" type="button" value="NoScore" onclick="sendWurf(document.getElementById('zero'))"></td>
+      </tr>
+    </table>    
       <table id="calcu" width="100%">
           <tr>
-              <td><input type="button" value="1" onclick="sendWurf(this)"></td>
-              <td><input type="button" value="2" onclick="sendWurf(this)"></td>
-              <td><input type="button" value="3" onclick="sendWurf(this)"></td>
-              <td><input type="button" value="4" onclick="sendWurf(this)"></td>
-              <td><input type="button" value="5" onclick="sendWurf(this)"></td>
-              <td><input type="button" value="6" onclick="sendWurf(this)"></td>
-              <td><input type="button" value="7" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="1" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="2" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="3" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="4" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="5" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="6" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="7" onclick="sendWurf(this)"></td>
 
           </tr>
           <tr>
-              <td><input type="button" value="8" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="9" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="10" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="11" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="12" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="13" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="14" onclick="calcWurfNr(this)"></td>
+              <td><input type="button" class="buttonValues" value="8" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="9" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="10" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="11" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="12" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="13" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="14" onclick="sendWurf(this)"></td>
           </tr>
           <tr>
-              <td><input type="button" value="15" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="16" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="17" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="18" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="19" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="20" onclick="calcWurfNr(this)"></td>
-              <td><input type="button" value="25" onclick="calcWurfNr(this)" id="bull"></td>
+              <td><input type="button" class="buttonValues" value="15" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="16" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="17" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="18" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="19" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="20" onclick="sendWurf(this)"></td>
+              <td><input type="button" class="buttonValues" value="25" onclick="sendWurf(this)" id="bull"></td>
           </tr>
           <tr>
-              <td><input type="button" value="0" onclick="calcWurfNr(this)"></td>
-              <td colspan="2"><input type="button" value="Double" onclick="setDouble()" id="double"></td>
-              <td colspan="2"><input type="button" value="Triple" onclick="setTriple()" id="triple"></td>
-              <td colspan="2"><input type="button" value="Zurück" onclick="wurfZurück()"></td>
+              <td><input type="button" class="buttonValues" value="0" id="zero" onclick="sendWurf(this)"></td>
+              <td colspan="2"><input type="button" class="buttonValues" value="Double" onclick="toggleDouble()" id="double"></td>
+              <td colspan="2"><input type="button" class="buttonValues" value="Triple" onclick="toggleTriple()" id="triple"></td>
+              <td colspan="2"><input type="button" class="buttonValues" value="Zurück" onclick="wurfZurück()"></td>
           </tr>
       </table>
   </div>
