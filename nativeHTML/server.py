@@ -45,22 +45,42 @@ def handle_message(data):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
     spieler = data["currentSpieler"] #"Spieler1"  # TODO MUSS VARIABEL SEIN
-    if spieler:
+    if spieler == "Spieler1":
         spielerindex = '0'
-    else:
-        spielerindex = '1'
+    else: 
+        if spieler == "Spieler2":
+            spielerindex = '1'
     cursor.execute("select punkte from dartgame where spieler = '"+spieler+"'")
-    wert = cursor.fetchone()[0] - int(data["data"])
-    query = "UPDATE dartgame SET punkte =  " + str(wert)  + " WHERE spieler = '"+ spieler + "' ;"
-    print("neue Punktzahl: ",str(wert))
+    punktstand = cursor.fetchone()[0] - int(data["data"])
+    query = "UPDATE dartgame SET punkte =  " + str(punktstand)  + " WHERE spieler = '"+ spieler + "' ;"
+    print("neue Punktzahl: ",str(punktstand))
     cursor.execute(query)
     cursor.execute("select wurfliste from dartgame where spieler = '"+spieler+"'")
-    wert = cursor.fetchone()[0] + ";" + data["data"]
+    wert = cursor.fetchone()[0] + ";" + str(data["data"])
     query = "UPDATE dartgame SET wurfliste =  '" + str(wert)  + "' WHERE spieler = '"+ spieler + "' ;"
-    print("Wurfliste: ",str(wert))
-    print(wert.split(";")[1:])
     cursor.execute(query)
+    wurfliste = wert.split(";")[1:]
 
+    print("Wurfliste: ",wurfliste)
+
+    avg = round((501-punktstand)/len(wurfliste),2)
+    emit('avg',{'avg': str(avg)}, broadcast=True)
+
+
+
+    rest = len(wurfliste) % 3
+    if rest == 0:
+        emit('wurf_historie',{'wurfnummer': '3', 'wert': str(data["data"])}, broadcast=True)
+        print("Spielerwechsel")
+        print(wurfliste[-3:])
+        if spieler == "Spieler1":
+            emit('spieler_wechsel', {'spieler': 'Spieler2'}, broadcast=True)
+        if spieler == "Spieler2":
+            emit('spieler_wechsel', {'spieler': 'Spieler1'}, broadcast=True)
+    if rest == 1:
+        emit('wurf_historie',{'wurfnummer': '1', 'wert': str(data["data"])}, broadcast=True)
+    if rest == 2:
+        emit('wurf_historie',{'wurfnummer': '2', 'wert': str(data["data"])}, broadcast=True)
 
 
     connection.commit()
@@ -82,11 +102,15 @@ def handle_message(data):
         requests.post(url, data=json.dumps(data), headers=headers,timeout=0.5)
     except requests.Timeout:
         pass
+
+
+
+
 @socketio.on('init event')
 def test_message(message):
     global database_path
     connection = sqlite3.connect(database_path)
-
+    emit('spieler_wechsel', {'spieler': 'Spieler1'}, broadcast=True)
     cursor = connection.cursor()
     print("initialisiere Spiel")
     alle_spieler = ["Spieler1","Spieler2"]
