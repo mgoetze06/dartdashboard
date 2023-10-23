@@ -59,7 +59,10 @@
 
         }
     });
+    function sendZurueck(){
+      socket.emit('zurueck');
 
+    }
   function sendData(object){
     socket.emit('message', {data: 'I\'m connected!'});
 
@@ -257,7 +260,7 @@
               <td><input type="button" class="buttonValues" value="0" id="zero" onclick="sendWurf(this)"></td>
               <td colspan="2"><input type="button" class="buttonValues" value="Double" onclick="toggleDouble()" id="double"></td>
               <td colspan="2"><input type="button" class="buttonValues" value="Triple" onclick="toggleTriple()" id="triple"></td>
-              <td colspan="2"><input type="button" class="buttonValues" value="Zurück" onclick="wurfZurück()"></td>
+              <td colspan="2"><input type="button" class="buttonValues" value="Zurück" onclick="sendZurueck()"></td>
           </tr>
       </table>
   </div>
