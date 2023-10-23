@@ -33,16 +33,19 @@
       //$('#textBox').append('<p>Received: ' + msg.data + '</p>');
       if (msg.spieler == "Spieler1"){
         spieler = true;
+        
         wurf_id_pre = "wurf1"
+        var spielerindex = "0"
         document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
         document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#ecedef";
       }else{
         spieler = false;
         wurf_id_pre = "wurf2"
+        var spielerindex = "1"
         document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#ecedef";
         document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#bfe0c4";
         }
-
+        socket.emit('spielerwechselZumESP', {data: spielerindex});
         for(var i = 1; i < 4; i++){
             wurf_id = wurf_id_pre + i
             document.getElementById(wurf_id).value = "";

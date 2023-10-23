@@ -28,14 +28,21 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
+def SendSpielstandToESP(data):
+    global url,headers
+    try:
+        requests.post(url, data=json.dumps(data), headers=headers,timeout=0.5)
+    except requests.Timeout:
+        pass
+
 def UpdateSpielstand():
     global database_path
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
     alle_spieler = ["Spieler1","Spieler2"]
     punktstände = []
-    for spieler in alle_spieler:
-        cursor.execute("select punkte from dartgame where spieler = '"+spieler+"'")
+    for s in alle_spieler:
+        cursor.execute("select punkte from dartgame where spieler = '"+s+"'")
         wert = cursor.fetchone()[0]
         punktstände.append(wert)
     if str(punktstände[0]) == '501' and str(punktstände[1]) == '501':
@@ -51,12 +58,8 @@ def UpdateSpielstand():
     else: 
         if spieler == "Spieler2":
             spielerindex = '1'
-    global url,headers
     data = {'punkte0': str(punktstände[0]), 'punkte1': str(punktstände[1]), 'spieler': spielerindex}
-    try:
-        requests.post(url, data=json.dumps(data), headers=headers,timeout=0.5)
-    except requests.Timeout:
-        pass
+    SendSpielstandToESP(data)
 
     if str(punktstände[0]) == '501' and str(punktstände[1]) == '501':
         initGame()
@@ -83,6 +86,7 @@ def WurflisteZuEinzelnenWürfen(wurfliste,ignoreSpielerwechsel):
                 emit('spieler_wechsel', {'spieler': 'Spieler2'}, broadcast=True)
             if spieler == "Spieler2":
                 emit('spieler_wechsel', {'spieler': 'Spieler1'}, broadcast=True)
+            
         return True
     if rest == 1:
         #emit('wurf_historie',{'wurfnummer': '1', 'wert': str(data["data"])}, broadcast=True)
@@ -166,6 +170,22 @@ def handle_message():
             wurfliste = wurfliste[1:]
         WurflisteZuEinzelnenWürfen(wurfliste,True)
     UpdateSpielstand()
+
+@socketio.on('spielerwechselZumESP')
+def handle_message(data):
+    global database_path
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+    alle_spieler = ["Spieler1","Spieler2"]
+    punktstände = []
+    for s in alle_spieler:
+        cursor.execute("select punkte from dartgame where spieler = '"+s+"'")
+        wert = cursor.fetchone()[0]
+        punktstände.append(wert)
+    connection.close()
+    dataESP = {'punkte0': str(punktstände[0]), 'punkte1': str(punktstände[1]), 'spieler': data["data"]}
+    SendSpielstandToESP(dataESP)
+
 
 @socketio.on('wurf')
 def handle_message(data):
