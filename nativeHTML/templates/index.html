@@ -19,10 +19,53 @@
       document.getElementById('punkteSpieler2').value = msg.punktstand2;
 
     });
+    socket.on('wurf_historie', function(msg) {
+      if(spieler){
+        wurf_id = "wurf1" + msg.wurfnummer;
+        document.getElementById(wurf_id).value = msg.wert;
+      }else{
+        wurf_id = "wurf2" + msg.wurfnummer;
+        document.getElementById(wurf_id).value = msg.wert;
+      }
+    });
+
+    socket.on('spieler_wechsel', function(msg) {
+      //$('#textBox').append('<p>Received: ' + msg.data + '</p>');
+      if (msg.spieler == "Spieler1"){
+        spieler = true;
+        
+        wurf_id_pre = "wurf1"
+        var spielerindex = "0"
+        document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
+        document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#ecedef";
+      }else{
+        spieler = false;
+        wurf_id_pre = "wurf2"
+        var spielerindex = "1"
+        document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#ecedef";
+        document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#bfe0c4";
+        }
+        socket.emit('spielerwechselZumESP', {data: spielerindex});
+        for(var i = 1; i < 4; i++){
+            wurf_id = wurf_id_pre + i
+            document.getElementById(wurf_id).value = "";
+        }
+    });
     socket.on('connect', function() {
         socket.emit('my event', {data: 'I\'m connected!'});
     });
+    socket.on('avg', function(msg) {
+        if(spieler){
+          document.getElementById("avgSpieler1").value = msg.avg;
+        }else{
+          document.getElementById("avgSpieler2").value = msg.avg;
 
+        }
+    });
+    function sendZurueck(){
+      socket.emit('zurueck');
+
+    }
   function sendData(object){
     socket.emit('message', {data: 'I\'m connected!'});
 
@@ -30,11 +73,15 @@
   function toggleTriple(){
     triple = !triple;
     double = false;
+    document.getElementById("bull").disabled = false;
+    document.getElementById("bull").style.backgroundColor = "#ecedef";
     ColorsTripleDouble();
   }
   function toggleDouble(){
     double = !double;
     triple = false;
+    document.getElementById("bull").disabled = false;
+    document.getElementById("bull").style.backgroundColor = "#ecedef";
     ColorsTripleDouble();
   }
 
@@ -46,6 +93,8 @@
     }
     if(triple){
       document.getElementById("triple").style.backgroundColor = "red";
+      document.getElementById("bull").disabled = true;
+      document.getElementById("bull").style.backgroundColor = "#3d3d3d";
     }
 
   }
@@ -97,13 +146,13 @@
       winner = false;
     }
     if(wurf_nr == 3 || überworfen){
-      spieler = !spieler;
-      wurf_nr = 0;
-      document.getElementsByClassName(andererSpieler)[0].style.backgroundColor = "#bfe0c4";
-      document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "#ecedef";
+      //spieler = !spieler;
+      //wurf_nr = 0;
+      //document.getElementsByClassName(andererSpieler)[0].style.backgroundColor = "#bfe0c4";
+      //document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "#ecedef";
     }else{
-      document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "#bfe0c4";
-      document.getElementsByClassName(andererSpieler)[0].style.backgroundColor = "#ecedef";
+      //document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "#bfe0c4";
+      //document.getElementsByClassName(andererSpieler)[0].style.backgroundColor = "#ecedef";
     }
     document.getElementById('PunktEingabeFrei').value = "";
     triple = false;
@@ -111,13 +160,33 @@
     ColorsTripleDouble();
     //document.getElementById('sound1').play();
   }
+  function noscore(){
+    for(var i = 1; i < 4; i++){
+      sendWurf(document.getElementById('zero'))
+    }
+  }
 
   function sendBroadcast(){
+    //SPIEL STARTEN
     counter++;
     socket.emit('init event', {data: counter});
     document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
     document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#ecedef";
     document.getElementById('PunktEingabeFrei').value = "";
+    for(var i = 1; i < 4; i++){
+            wurf_id = "wurf1" + i;
+            wurf_id2 = "wurf2" + i;
+            document.getElementById(wurf_id).value = "";
+            document.getElementById(wurf_id2).value = "";
+    }
+    document.getElementById("avgSpieler1").value = "";
+    document.getElementById("avgSpieler2").value = "";
+    document.getElementById("double").style.backgroundColor = "#ecedef";
+    document.getElementById("triple").style.backgroundColor = "#ecedef";
+    document.getElementById("bull").disabled = false;
+    document.getElementById("bull").style.backgroundColor = "#ecedef";
+    
+
   }
 
   </script>
@@ -138,7 +207,7 @@
   <div class="Spieler1 spieler">
       Spieler1<br>
       Punktestand:
-      <input class="punktstand" type="text" readonly id="punkteSpieler1"> Avg.: <input class="average" type="text" readonly id="avgSpieler1"><br>
+      <input class="punktstand" type="text" readonly id="punkteSpieler1"> Avg.: <input class="wurf" type="text" readonly id="avgSpieler1"><br>
       1:<input class="wurf" type="text" readonly id="wurf11">
       2:<input class="wurf" type="text" readonly id="wurf12">
       3:<input class="wurf" type="text" readonly id="wurf13">
@@ -146,7 +215,7 @@
   <div class="Spieler2 spieler">
       Spieler2<br>
       Punktestand:
-      <input class="punktstand" type="text" readonly id="punkteSpieler2"> Avg.: <input class="average" type="text" readonly id="avgSpieler2"><br>
+      <input class="punktstand" type="text" readonly id="punkteSpieler2"> Avg.: <input class="wurf" type="text" readonly id="avgSpieler2"><br>
       1:<input class="wurf" type="text" readonly id="wurf21">
       2:<input class="wurf" type="text" readonly id="wurf22">
       3:<input class="wurf" type="text" readonly id="wurf23">
@@ -158,7 +227,7 @@
           <input class="normalButton" style="width: 20%; background: white;color: black;  "type="text" id="PunktEingabeFrei">
           <input class="normalButton" style="width:40%;" type="button" value="Eingabe" onclick="sendWurf(document.getElementById('PunktEingabeFrei'))">
         </td>
-        <td><input class="normalButton" type="button" value="NoScore" onclick="sendWurf(document.getElementById('zero'))"></td>
+        <td><input class="normalButton" type="button" value="NoScore" onclick="noscore()"></td>
       </tr>
     </table>    
       <table id="calcu" width="100%">
@@ -194,7 +263,7 @@
               <td><input type="button" class="buttonValues" value="0" id="zero" onclick="sendWurf(this)"></td>
               <td colspan="2"><input type="button" class="buttonValues" value="Double" onclick="toggleDouble()" id="double"></td>
               <td colspan="2"><input type="button" class="buttonValues" value="Triple" onclick="toggleTriple()" id="triple"></td>
-              <td colspan="2"><input type="button" class="buttonValues" value="Zurück" onclick="wurfZurück()"></td>
+              <td colspan="2"><input type="button" class="buttonValues" value="Zurück" onclick="sendZurueck()"></td>
           </tr>
       </table>
   </div>
