@@ -13,7 +13,9 @@ headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 spieler = "Spieler1"
 
 file_path = os.path.dirname(os.path.abspath(sys.argv[0]))
-database_path = os.path.join(file_path,"database\\darts.db")
+database_path = os.path.join(file_path,"database")
+database_path = os.path.join(database_path,"darts.db")
+
 #connection = sqlite3.connect("C:\\projects\\DartDashboard\\nativeHTML\\clientserver\\database\\darts.db")
 connection = sqlite3.connect(database_path)
 
@@ -251,4 +253,4 @@ def initGame():
         pass
 
 if __name__ == '__main__':
-    socketio.run(app,host="0.0.0.0")
+    socketio.run(app,host="0.0.0.0",allow_unsafe_werkzeug=True)

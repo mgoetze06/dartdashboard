@@ -1,0 +1,6 @@
+FROM python:3.10
+WORKDIR /NativeHTML
+COPY requirements.txt /NativeHTML
+RUN pip install -r requirements.txt --no-cache-dir
+COPY . /NativeHTML
+CMD python server.py
