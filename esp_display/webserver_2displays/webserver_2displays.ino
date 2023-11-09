@@ -29,6 +29,11 @@ uint8_t invert_list[NUM_DISPLAYS] = {0,0};
 const char *ssid = WIFI_SSID;
 const char *pass = WIFI_PASSWORD;
 
+char prev_punkte0[16];
+char prev_punkte1[16];
+char spieler[1];
+
+
 ESP8266WebServer server(80);    // Create a webserver object that listens for HTTP request on port 80
 
 void handleRoot();              // function prototypes for HTTP handlers
@@ -36,6 +41,9 @@ void handleNotFound();
 
 void setup(){
     Serial.begin(9600);
+    sprintf(prev_punkte0, "%s", "0");
+    sprintf(prev_punkte1, "%s", "0");
+    sprintf(spieler, "%s", "0");
 
     Serial.setDebugOutput(true);
     Serial.println("init displays");
@@ -109,23 +117,50 @@ void handleUpdate(){
             if (postObj.containsKey("punkte0") && postObj.containsKey("punkte1")) {
  
                 Serial.println(F("done."));
- 
 
-                Multi_OLEDFill(0,0x00);
-                Multi_OLEDFill(1,0x00);
                 // Here store data or doing operation
-                Serial.print("punkte0: ");
                 const char* recievedData0 = postObj["punkte0"];
-                Serial.println(recievedData0);
                 sprintf(szTemp, "%s", recievedData0);
-                Multi_OLEDWriteString(0, 10, 0, szTemp, FONT_LARGE, 0);
+                if (szTemp != prev_punkte0){
+                  Multi_OLEDFill(0,0x00);
+                  Serial.print("punkte0: ");
+                  Serial.write(recievedData0,strlen(recievedData0));
+                  Multi_OLEDWriteString(0, 10, 1, szTemp, FONT_LARGE, 0);
+                  sprintf(prev_punkte0, "%s", szTemp);
+                }
+
 
                 Serial.print("punkte1: ");
                 const char* recievedData1 = postObj["punkte1"];
                 sprintf(szTemp, "%s", recievedData1);
-                Multi_OLEDWriteString(1, 10, 0, szTemp, FONT_LARGE, 0);
-                Serial.println(recievedData1);
+                if (szTemp != prev_punkte1){
+                  Multi_OLEDFill(1,0x00);
+                  Serial.print("punkte1: ");
+                  Serial.write(recievedData1,strlen(recievedData1));
+                  Multi_OLEDWriteString(1, 10, 1, szTemp, FONT_LARGE, 0);
+                  sprintf(prev_punkte1, "%s", szTemp);
+                }
                 const char* recievedData2 = postObj["spieler"];
+                Serial.println("Spieler:");
+                Serial.write(recievedData2,strlen(recievedData2));
+                sprintf(spieler, "%s", recievedData2);
+                for(int i=0;i < 10;i++){
+                  int y = i;
+                  Multi_OLEDDrawLine(atoi(spieler), 0, y, 127, y);
+                  y = 40 +i;
+                  Multi_OLEDDrawLine(atoi(spieler), 0, y, 127, y);
+                  if(i == 9){
+                    for(int j=0;j < 4;j++){
+                      int x = 2 + j;
+                      Multi_OLEDDrawLine(atoi(spieler), x, 0, x, y);
+                      x = 127 - j;
+                      Multi_OLEDDrawLine(atoi(spieler), x, 0, x, y);
+
+                    }
+
+                  }
+                }
+
                 serializeJson(doc, Serial);
                 // Serial.print("sender: ");
                 // Serial.println(postObj["sender"]);

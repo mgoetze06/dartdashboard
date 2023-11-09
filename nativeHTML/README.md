@@ -1,6 +1,6 @@
 # HTML Webserver
 
-aufgerufen mit: 
-> node .\app.js <br>
-
-aus einer Powershell Console
+als Docker Container
+nach erstellen von dockerfile und docker-compose.yml
+"docker compose up" ausführen
+anschließend container in portainer sichtbar
