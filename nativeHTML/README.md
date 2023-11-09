@@ -1,6 +1,5 @@
 # HTML Webserver
 
-aufgerufen mit: 
-> node .\app.js <br>
-
-aus einer Powershell Console
+> https://blog.tingwei.fans/self-hosted-website-on-a-raspberry-pi-part-2
+> docker compose up
+> 
