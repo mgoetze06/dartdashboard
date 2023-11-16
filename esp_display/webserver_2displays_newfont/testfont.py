@@ -515,6 +515,7 @@ font = [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x
 #for e in font:
 #    print(bin(e))
 import numpy
+import cv2
 s_16 = numpy.arange(0, len(font), 16)
 #print(s)
 #print(len(font))
@@ -534,13 +535,3 @@ print(s)
 for i in range(16):
     print(format(font[s+i], '08b'))
 
-
-
-with open("FontData.dat", "rb") as file:
-    binary_data = file.read()
-    # process the binary data
-
-s = 0
-print(s)
-for i in range(32):
-    print(format(font[s+i], '016b'))
