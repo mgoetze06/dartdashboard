@@ -48,6 +48,8 @@ void setup(){
         Serial.println("write to display");
         sprintf(szTemp, "0");
         Multi_OLEDWriteString(i, 0, 0, szTemp, FONT_FILL, 0);
+        sprintf(szTemp, "1");
+        Multi_OLEDWriteString(i, 32, 0, szTemp, FONT_FILL, 0);
         Serial.println("write to display done");
         // sprintf(szTemp, "IP: %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
         // Multi_OLEDWriteString(i, 10, 2, szTemp, FONT_SMALL, 0);
