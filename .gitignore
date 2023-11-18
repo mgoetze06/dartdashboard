@@ -1,2 +1,3 @@
 esp_display/simplewebserver/secrets.h
 esp_display/webserver_2displays/secrets.h
+esp_display/webserver_2displays_newfont/webserver_2displays/secrets.h

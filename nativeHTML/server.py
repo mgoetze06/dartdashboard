@@ -173,20 +173,20 @@ def handle_message():
         WurflisteZuEinzelnenWürfen(wurfliste,True)
     UpdateSpielstand()
 
-@socketio.on('spielerwechselZumESP')
-def handle_message(data):
-    global database_path
-    connection = sqlite3.connect(database_path)
-    cursor = connection.cursor()
-    alle_spieler = ["Spieler1","Spieler2"]
-    punktstände = []
-    for s in alle_spieler:
-        cursor.execute("select punkte from dartgame where spieler = '"+s+"'")
-        wert = cursor.fetchone()[0]
-        punktstände.append(wert)
-    connection.close()
-    dataESP = {'punkte0': str(punktstände[0]), 'punkte1': str(punktstände[1]), 'spieler': data["data"]}
-    SendSpielstandToESP(dataESP)
+# @socketio.on('spielerwechselZumESP')
+# def handle_message(data):
+#     global database_path
+#     connection = sqlite3.connect(database_path)
+#     cursor = connection.cursor()
+#     alle_spieler = ["Spieler1","Spieler2"]
+#     punktstände = []
+#     for s in alle_spieler:
+#         cursor.execute("select punkte from dartgame where spieler = '"+s+"'")
+#         wert = cursor.fetchone()[0]
+#         punktstände.append(wert)
+#     connection.close()
+#     dataESP = {'punkte0': str(punktstände[0]), 'punkte1': str(punktstände[1]), 'spieler': data["data"]}
+#     SendSpielstandToESP(dataESP)
 
 
 @socketio.on('wurf')
