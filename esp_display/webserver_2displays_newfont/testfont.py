@@ -521,10 +521,13 @@ s_16 = numpy.arange(0, len(font), 16)
 #print(len(font))
 s = 4160
 for i in range(16):
+    print(font[s+i])
     print(format(font[s+i], '08b'))
 s = 4160+16
 print(s)
 for i in range(16):
+    print(font[s+i])
+    print(hex(font[s+i]))
     print(format(font[s+i], '08b'))
 s = 4160+32
 print(s)
