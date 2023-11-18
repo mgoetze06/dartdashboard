@@ -46,7 +46,7 @@ void setup(){
         Multi_OLEDFill(i, 0);
         Multi_OLEDSetContrast(i, 20);
         Serial.println("write to display");
-        sprintf(szTemp, "A");
+        sprintf(szTemp, "0");
         Multi_OLEDWriteString(i, 0, 0, szTemp, FONT_FILL, 0);
         Serial.println("write to display done");
         // sprintf(szTemp, "IP: %d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
