@@ -1,11 +1,11 @@
-  @media (hover: hover) {
+  /* @media (hover: hover) {
     input[type=button]:hover{
         background: #a4a4a7; 
         transition: 200ms;
     }
-}
+  } */
   .wurf{
-      width: 15%; 
+      width: 25%; 
       font-size: 32px;  
       border-radius: 10%; 
       box-sizing: border-box;
@@ -38,10 +38,13 @@
       font-weight: 100; 
       text-align: right; 
   }
+  .buttonValues:active{
+    color: #3a2222;  
+  }
   .buttonValues{
     width: 100%;   
     height: 100px;
-    margin-right: 5px;  
+    margin-right: 15px;  
     background: #ecedef;  
     border: none;  
     font-size: 30px;  
@@ -61,13 +64,21 @@
 
       width: 100%;
       }
+      .buttonValues:active{
+        color: #3a2222;  
+      }
+
       .buttonValues{ 
-        height: 250px;
-        font-size: 60;
+        height: 270px;
+        font-size: 60px;
+      }
+      .wurf{
+        font-size: 50px;
       }
   }
 
   .spieler {
+    width: 100%;
     margin-top: 0px;
     padding: 0px;
   }
