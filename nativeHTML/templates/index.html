@@ -22,10 +22,12 @@
     socket.on('wurf_historie', function(msg) {
       if(spieler){
         wurf_id = "wurf1" + msg.wurfnummer;
-        document.getElementById(wurf_id).value = msg.wert;
       }else{
         wurf_id = "wurf2" + msg.wurfnummer;
-        document.getElementById(wurf_id).value = msg.wert;
+      }
+      document.getElementById(wurf_id).value = msg.wert;
+      if(msg.wert.startsWith("E")){
+        document.getElementById(wurf_id).style.backgroundColor = "Red";
       }
     });
 
@@ -49,6 +51,7 @@
         for(var i = 1; i < 4; i++){
             wurf_id = wurf_id_pre + i
             document.getElementById(wurf_id).value = "";
+            document.getElementById(wurf_id).style.backgroundColor = null;
         }
     });
     socket.on('connect', function() {
@@ -140,6 +143,7 @@
     }else{
       if(currentPunktstand - wert < 2){
                     überworfen = true;
+                    socket.emit('ueberworfen', {data: wert, currentSpieler: currentSpieler});
       }else{
           socket.emit('wurf', {data: wert, currentSpieler: currentSpieler});
       }
