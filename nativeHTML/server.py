@@ -75,25 +75,26 @@ def LeseWurfliste(spieler,cursor=None,schließeUeberworfenEin=False):
         connection = sqlite3.connect(database_path)
         cursor = connection.cursor()
     cursor.execute("select wurfliste from dartgame where spieler = '"+spieler+"'")
-    wurfliste = cursor.fetchone()[0].split(";")[1:]
+    wurfliste = cursor.fetchone()[0].split(";")#[1:]
     print("wurfliste in [LESEWURFLISTE()]",wurfliste)
     print("Länge: ",len(wurfliste))
-    if schließeUeberworfenEin:
-        #gib die gesamte wurfliste zurück inkl. der überworfenen Aufnahmen
-        return wurfliste
-    else:
-        #gib nur die würfe zurück, in denen nicht überworfen wurde
-        outliste = []
-        if len(wurfliste) > 0:
-            for i in range(len(wurfliste)):
-                if not wurfliste[i].contains("E"):
-                    outliste.append(wurfliste[i])
+    return wurfliste
+    # if schließeUeberworfenEin:
+    #     #gib die gesamte wurfliste zurück inkl. der überworfenen Aufnahmen
+    #     return wurfliste
+    # else:
+    #     #gib nur die würfe zurück, in denen nicht überworfen wurde
+    #     outliste = []
+    #     if len(wurfliste) > 0:
+    #         for i in range(len(wurfliste)):
+    #             if not wurfliste[i].contains("E"):
+    #                 outliste.append(wurfliste[i])
 
-            if outliste[0] == "":
-                outliste = outliste[1:]
-        else:
-            outliste = [";"]
-        return outliste
+    #         if outliste[0] == "":
+    #             outliste = outliste[1:]
+    #     else:
+    #         outliste = [";"]
+    #    return outliste
 
 def WurflisteZuEinzelnenWürfen(wurfliste,ignoreSpielerwechsel):
     global spieler
@@ -152,12 +153,12 @@ def handle_message(data):
     wurfliste = cursor.fetchone()[0].split(";")[1:]
     rest = len(wurfliste) % 3
     print("rest: ",rest)
-    errorliste = wurfliste[-rest:]
-    print("errorliste",errorliste)
-    errorliste.append(str(data["data"]))
-    while len(errorliste)<3:
-        errorliste.append("0")
-    print("errorliste",errorliste)
+    #errorliste = wurfliste[-rest:]
+    #print("errorliste",errorliste)
+    #errorliste.append(str(data["data"]))
+    #while len(errorliste)<3:
+    #    errorliste.append("0")
+    #print("errorliste",errorliste)
     print(wurfliste[-rest:])
     outliste = wurfliste[0:-rest]
 
@@ -166,9 +167,9 @@ def handle_message(data):
     for elem in outliste:
         last_committed_punktstand += int(elem)
     last_committed_punktstand = 501 - last_committed_punktstand
-    print("outliste",outliste)
-    for e in errorliste:
-        outliste.append("E"+e)
+    #print("outliste",outliste)
+    #for e in errorliste:
+    #    outliste.append("E"+e)
     stringToWrite = ";".join(outliste)
     query = "UPDATE dartgame SET wurfliste =  '" + str(stringToWrite)  + "' WHERE spieler = '"+ spieler + "' ;"
     cursor.execute(query)
@@ -288,13 +289,16 @@ def handle_message(data):
     query = "UPDATE dartgame SET wurfliste =  '" + str(stringToWrite)  + "' WHERE spieler = '"+ spieler + "' ;"
     cursor.execute(query)
     connection.commit()
-
-    wurfliste = stringToWrite.split(";")[1:]
+    if len(wurfliste)>1:
+        wurfliste = stringToWrite.split(";")[1:]
+    else:
+        wurfliste = stringToWrite.split(";")
 
     print("Wurfliste: ",wurfliste)
+    if len(wurfliste)>0:
 
-    avg = round((501-punktstand)/len(wurfliste)*3,2)
-    emit('avg',{'avg': str(avg)}, broadcast=True)
+        avg = round((501-punktstand)/len(wurfliste)*3,2)
+        emit('avg',{'avg': str(avg)}, broadcast=True)
 
     WurflisteZuEinzelnenWürfen(wurfliste,False)
 
