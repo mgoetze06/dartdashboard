@@ -69,6 +69,20 @@
       socket.emit('zurueck');
 
     }
+
+  function sendekorrektur(object,spielerkorrektur){
+    var confirmtext = "Korrektur " + object.value + " für " + spielerkorrektur + " durchführen?"
+    if (confirm(confirmtext) == true) {
+      socket.emit('korrektur', {data: object.value, currentSpieler: spielerkorrektur});
+    }
+    
+  }
+
+function fordereSpielerwechsel(){
+  socket.emit('fordereSpielerwechsel', {data: "wechsel"});
+
+}
+
   function sendData(object){
     socket.emit('message', {data: 'I\'m connected!'});
 
@@ -227,9 +241,10 @@
     <table id="calcu" width="100%" style="background-color: dimgrey;">
       <tr>
         <td colspan="1"><input class="buttonNormal" value="Spiel Starten" type="button" onclick="sendBroadcast()"></td>
-        <td colspan="2"><input class="normalButton" style="width: 95%; background: white;color: black;"type="number" min="0" max="501" step="1" id="PunktEingabeFrei"></td>
-        <td colspan="1"><input class="buttonNormal" type="button" value="Korrektur" onclick="sendWurf(document.getElementById('PunktEingabeFrei'))"></td>
-        <td colspan="1"><input class="buttonNormal" type="button" value="Spielerwechsel" onclick="sendWurf(document.getElementById('PunktEingabeFrei'))"></td>
+        <td colspan="1"><input class="buttonNormal" type="button" value="Korrektur S1" onclick="sendekorrektur(document.getElementById('PunktEingabeFrei'),'Spieler1')"></td>
+        <td colspan="1"><input class="normalButton" style="width: 95%; background: white;color: black;"type="number" min="0" max="501" step="1" id="PunktEingabeFrei"></td>
+        <td colspan="1"><input class="buttonNormal" type="button" value="Korrektur S2" onclick="sendekorrektur(document.getElementById('PunktEingabeFrei'),'Spieler2')"></td>
+        <td colspan="1"><input class="buttonNormal" type="button" value="Spielerwechsel" onclick="fordereSpielerwechsel()"></td>
       </tr>
     </table>
   </div>
