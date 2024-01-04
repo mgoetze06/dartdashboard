@@ -97,7 +97,7 @@ def LeseWurfliste(spieler,cursor=None,schließeUeberworfenEin=False):
     #    return outliste
 
 def WurflisteZuEinzelnenWürfen(wurfliste,ignoreSpielerwechsel):
-    global spieler
+    global spieler,database_path
     print("WurflisteZuEinzelnenWürfen: ")
     print(spieler)
     print(wurfliste)
@@ -112,8 +112,16 @@ def WurflisteZuEinzelnenWürfen(wurfliste,ignoreSpielerwechsel):
         print(wurfliste[-3:])
         if not ignoreSpielerwechsel:
             print("Spielerwechsel")
-
+            if len(wurfliste)>0:
+                connection = sqlite3.connect(database_path)
+                cursor = connection.cursor()
+                cursor.execute("select punkte from dartgame where spieler = '"+spieler+"'")
+                punktstand = cursor.fetchone()[0]
+                avg = round((501-punktstand)/len(wurfliste)*3,2)
+                emit('avg',{'avg': str(avg)}, broadcast=True)
             if spieler == "Spieler1":
+
+
                 emit('spieler_wechsel', {'spieler': 'Spieler2'}, broadcast=True)
             if spieler == "Spieler2":
                 emit('spieler_wechsel', {'spieler': 'Spieler1'}, broadcast=True)
@@ -138,6 +146,41 @@ def index():
 def handle_message(data):
     print('received message:')
     print(data["data"])
+
+@socketio.on('korrektur')
+def handle_korrektur(data):
+    global database_path
+    print('received message:')
+    print(data)
+    punktstand = data["data"]
+    spieler = data["currentSpieler"]
+    print(punktstand)
+    print("Korrektur für: ",spieler)
+    if punktstand != "" or punktstand != None:
+        connection = sqlite3.connect(database_path)
+        cursor = connection.cursor()
+        query = "UPDATE dartgame SET punkte =  " + str(punktstand)  + " WHERE spieler = '"+ spieler + "' ;"
+        print("neue Punktzahl: ",str(punktstand))
+        cursor.execute(query)
+        connection.commit()
+        #handle_spielerwechsel(null)
+        UpdateSpielstand()
+
+@socketio.on('fordereSpielerwechsel')
+def handle_spielerwechsel(data):
+    global spieler
+
+    print("manueller Spielerwechsel gefordert. Aktueller Spieler: ",spieler)
+
+    if spieler == "Spieler1":
+        spieler = "Spieler2"
+    else:
+        if spieler == "Spieler2":
+            spieler = "Spieler1"
+    emit('spieler_wechsel', {'spieler': spieler}, broadcast=True)
+    print("manueller Spielerwechsel gesendet: ",spieler)
+
+
 
 @socketio.on('ueberworfen')
 def handle_message(data):
@@ -295,10 +338,7 @@ def handle_message(data):
         wurfliste = stringToWrite.split(";")
 
     print("Wurfliste: ",wurfliste)
-    if len(wurfliste)>0:
 
-        avg = round((501-punktstand)/len(wurfliste)*3,2)
-        emit('avg',{'avg': str(avg)}, broadcast=True)
 
     WurflisteZuEinzelnenWürfen(wurfliste,False)
 
