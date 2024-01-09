@@ -54,6 +54,19 @@
     color: #235558;  
     cursor: pointer;    
   }
+  .buttonNormal{
+    width: 100%;   
+    height: 70px;
+    margin-right: 15px;  
+    background: #ecedef;  
+    border: none;  
+    font-size: 24px;  
+    line-height: 30px;  
+    border-radius: 10px;  
+    font-weight: 350;  
+    color: #235558;  
+    cursor: pointer;    
+  }
   #center {
     margin: auto;
     width: 40%;
@@ -87,6 +100,7 @@
     margin: 5px;  
     background: #ecedef;  
     border: none;  
+    height: 70px;
     font-size: 30px;  
     line-height: 30px;  
     border-radius: 10px;  

@@ -12,6 +12,9 @@ headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
 spieler = "Spieler1"
 
+last_committed_punktstand1 = 501
+last_committed_punktstand2 = 501
+
 file_path = os.path.dirname(os.path.abspath(sys.argv[0]))
 database_path = os.path.join(file_path,"database")
 database_path = os.path.join(database_path,"darts.db")
@@ -66,9 +69,35 @@ def UpdateSpielstand():
     if str(punktstände[0]) == '501' and str(punktstände[1]) == '501':
         initGame()
 
+def LeseWurfliste(spieler,cursor=None,schließeUeberworfenEin=False):
+    global database_path
+    if not cursor:
+        connection = sqlite3.connect(database_path)
+        cursor = connection.cursor()
+    cursor.execute("select wurfliste from dartgame where spieler = '"+spieler+"'")
+    wurfliste = cursor.fetchone()[0].split(";")#[1:]
+    print("wurfliste in [LESEWURFLISTE()]",wurfliste)
+    print("Länge: ",len(wurfliste))
+    return wurfliste
+    # if schließeUeberworfenEin:
+    #     #gib die gesamte wurfliste zurück inkl. der überworfenen Aufnahmen
+    #     return wurfliste
+    # else:
+    #     #gib nur die würfe zurück, in denen nicht überworfen wurde
+    #     outliste = []
+    #     if len(wurfliste) > 0:
+    #         for i in range(len(wurfliste)):
+    #             if not wurfliste[i].contains("E"):
+    #                 outliste.append(wurfliste[i])
+
+    #         if outliste[0] == "":
+    #             outliste = outliste[1:]
+    #     else:
+    #         outliste = [";"]
+    #    return outliste
 
 def WurflisteZuEinzelnenWürfen(wurfliste,ignoreSpielerwechsel):
-    global spieler
+    global spieler,database_path
     print("WurflisteZuEinzelnenWürfen: ")
     print(spieler)
     print(wurfliste)
@@ -83,8 +112,16 @@ def WurflisteZuEinzelnenWürfen(wurfliste,ignoreSpielerwechsel):
         print(wurfliste[-3:])
         if not ignoreSpielerwechsel:
             print("Spielerwechsel")
-
+            if len(wurfliste)>0:
+                connection = sqlite3.connect(database_path)
+                cursor = connection.cursor()
+                cursor.execute("select punkte from dartgame where spieler = '"+spieler+"'")
+                punktstand = cursor.fetchone()[0]
+                avg = round((501-punktstand)/len(wurfliste)*3,2)
+                emit('avg',{'avg': str(avg)}, broadcast=True)
             if spieler == "Spieler1":
+
+
                 emit('spieler_wechsel', {'spieler': 'Spieler2'}, broadcast=True)
             if spieler == "Spieler2":
                 emit('spieler_wechsel', {'spieler': 'Spieler1'}, broadcast=True)
@@ -110,13 +147,97 @@ def handle_message(data):
     print('received message:')
     print(data["data"])
 
+@socketio.on('korrektur')
+def handle_korrektur(data):
+    global database_path
+    print('received message:')
+    print(data)
+    punktstand = data["data"]
+    spieler = data["currentSpieler"]
+    print(punktstand)
+    print("Korrektur für: ",spieler)
+    if punktstand != "" or punktstand != None:
+        connection = sqlite3.connect(database_path)
+        cursor = connection.cursor()
+        query = "UPDATE dartgame SET punkte =  " + str(punktstand)  + " WHERE spieler = '"+ spieler + "' ;"
+        print("neue Punktzahl: ",str(punktstand))
+        cursor.execute(query)
+        connection.commit()
+        #handle_spielerwechsel(null)
+        UpdateSpielstand()
+
+@socketio.on('fordereSpielerwechsel')
+def handle_spielerwechsel(data):
+    global spieler
+
+    print("manueller Spielerwechsel gefordert. Aktueller Spieler: ",spieler)
+
+    if spieler == "Spieler1":
+        spieler = "Spieler2"
+    else:
+        if spieler == "Spieler2":
+            spieler = "Spieler1"
+    emit('spieler_wechsel', {'spieler': spieler}, broadcast=True)
+    print("manueller Spielerwechsel gesendet: ",spieler)
+
+
+
+@socketio.on('ueberworfen')
+def handle_message(data):
+    global database_path,spieler,last_committed_punktstand1,last_committed_punktstand2
+    print('ueberworfen:')
+    print(data["data"])
+    print(data["currentSpieler"])
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+    spieler = data["currentSpieler"] #"Spieler1"  # TODO MUSS VARIABEL SEIN
+
+    cursor.execute("select wurfliste from dartgame where spieler = '"+spieler+"'")
+    wurfliste = cursor.fetchone()[0].split(";")[1:]
+    rest = len(wurfliste) % 3
+    print("rest: ",rest)
+    #errorliste = wurfliste[-rest:]
+    #print("errorliste",errorliste)
+    #errorliste.append(str(data["data"]))
+    #while len(errorliste)<3:
+    #    errorliste.append("0")
+    #print("errorliste",errorliste)
+    print(wurfliste[-rest:])
+    outliste = wurfliste[0:-rest]
+
+    #alten punktstand berechnen, bevor die Fehlwürfe an die Liste angehangen werden
+    last_committed_punktstand = 0
+    for elem in outliste:
+        last_committed_punktstand += int(elem)
+    last_committed_punktstand = 501 - last_committed_punktstand
+    #print("outliste",outliste)
+    #for e in errorliste:
+    #    outliste.append("E"+e)
+    stringToWrite = ";".join(outliste)
+    query = "UPDATE dartgame SET wurfliste =  '" + str(stringToWrite)  + "' WHERE spieler = '"+ spieler + "' ;"
+    cursor.execute(query)
+
+
+
+    if spieler == "Spieler1":
+        last_committed_punktstand1 = last_committed_punktstand
+        query = "UPDATE dartgame SET punkte =  " + str(last_committed_punktstand)  + " WHERE spieler = '"+ spieler + "' ;"
+    if spieler == "Spieler2":
+        last_committed_punktstand2 = last_committed_punktstand
+        query = "UPDATE dartgame SET punkte =  " + str(last_committed_punktstand)  + " WHERE spieler = '"+ spieler + "' ;"
+    cursor.execute(query)
+    connection.commit()
+    WurflisteZuEinzelnenWürfen(outliste,False)
+    UpdateSpielstand()
+
+
 @socketio.on('zurueck')
 def handle_message():
     global database_path,spieler
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
     cursor.execute("select wurfliste from dartgame where spieler = '"+spieler+"'")
-    wurfliste = cursor.fetchone()[0].split(";")
+    wurfliste = LeseWurfliste(spieler,cursor,schließeUeberworfenEin=False)
     if wurfliste[0] =="":
         wurfliste = wurfliste[1:]
     WurflisteZuEinzelnenWürfen(["","",""],True)
@@ -128,8 +249,7 @@ def handle_message():
         if spieler == "Spieler2":
             spieler = "Spieler1"
             emit('spieler_wechsel', {'spieler': 'Spieler1'}, broadcast=True)
-        cursor.execute("select wurfliste from dartgame where spieler = '"+spieler+"'")
-        wurfliste = cursor.fetchone()[0].split(";")
+        wurfliste = LeseWurfliste(spieler,cursor,schließeUeberworfenEin=False)
         if wurfliste[0] =="":
             wurfliste = wurfliste[1:]
 
@@ -166,8 +286,7 @@ def handle_message():
         wurfliste = ["","",""]
     wechsel = WurflisteZuEinzelnenWürfen(wurfliste,False)
     if wechsel:
-        cursor.execute("select wurfliste from dartgame where spieler = '"+spieler+"'")
-        wurfliste = cursor.fetchone()[0].split(";")
+        wurfliste = LeseWurfliste(spieler,cursor,schließeUeberworfenEin=False)
         if wurfliste[0] =="":
             wurfliste = wurfliste[1:]
         WurflisteZuEinzelnenWürfen(wurfliste,True)
@@ -204,18 +323,22 @@ def handle_message(data):
     query = "UPDATE dartgame SET punkte =  " + str(punktstand)  + " WHERE spieler = '"+ spieler + "' ;"
     print("neue Punktzahl: ",str(punktstand))
     cursor.execute(query)
-    cursor.execute("select wurfliste from dartgame where spieler = '"+spieler+"'")
-    wert = cursor.fetchone()[0] + ";" + str(data["data"])
-    query = "UPDATE dartgame SET wurfliste =  '" + str(wert)  + "' WHERE spieler = '"+ spieler + "' ;"
+    #cursor.execute("select wurfliste from dartgame where spieler = '"+spieler+"'")
+    #wert = cursor.fetchone()[0] + ";" + str(data["data"])
+    wurfliste = LeseWurfliste(spieler,cursor,schließeUeberworfenEin=False)
+    wurfliste.append(str(data["data"]))
+    print(wurfliste)
+    stringToWrite = ";".join(wurfliste)
+    query = "UPDATE dartgame SET wurfliste =  '" + str(stringToWrite)  + "' WHERE spieler = '"+ spieler + "' ;"
     cursor.execute(query)
     connection.commit()
-
-    wurfliste = wert.split(";")[1:]
+    if len(wurfliste)>1:
+        wurfliste = stringToWrite.split(";")[1:]
+    else:
+        wurfliste = stringToWrite.split(";")
 
     print("Wurfliste: ",wurfliste)
 
-    avg = round((501-punktstand)/len(wurfliste),2)
-    emit('avg',{'avg': str(avg)}, broadcast=True)
 
     WurflisteZuEinzelnenWürfen(wurfliste,False)
 
