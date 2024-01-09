@@ -6,7 +6,7 @@ def nothing(x):
     pass
 
 # Load an image
-img = cv2.imread('C:\projects\DartDashboard\camera-detection\edges.png')
+img = cv2.imread('C:\projects\DartDashboard\camera-detection\images\WIN_20240109_20_42_21_Pro.jpg')
 
 # Resize The image
 if img.shape[1] > 600:
@@ -40,24 +40,24 @@ while(1):
     edge_detected_image = cv2.Canny(bilateral_filtered_image, 75, 200)
     
     # Find contours
-    contours, _= cv2.findContours(edge_detected_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    #contours, _= cv2.findContours(edge_detected_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-    contour_list = []
-    for contour in contours:
-        # approximte for circles
-        approx = cv2.approxPolyDP(contour,0.01*cv2.arcLength(contour,True),True)
-        area = cv2.contourArea(contour)
-        if ((len(approx) > 8) & (area > 30) ):
-            contour_list.append(contour)
+    #contour_list = []
+    #for contour in contours:
+    #    # approximte for circles
+    #    approx = cv2.approxPolyDP(contour,0.01*cv2.arcLength(contour,True),True)
+    #    area = cv2.contourArea(contour)
+    #    if ((len(approx) > 8) & (area > 30) ):
+    #        contour_list.append(contour)
     
     # Draw contours on the original image
-    cv2.drawContours(clone, contour_list,  -1, (255,0,0), 2)
+    #cv2.drawContours(clone, contour_list,  -1, (255,0,0), 2)
     
     # there is an outer boundary and inner boundary for each eadge, so contours double
-    print('Number of found circles: {}'.format(int(len(contour_list)/2)))
+    #print('Number of found circles: {}'.format(int(len(contour_list)/2)))
 
     #Displaying the results     
-    cv2.imshow('Objects Detected', clone)
+    cv2.imshow('Objects Detected', edge_detected_image)
     cv2.imshow("Treshed", gray_threshed)
     
     # ESC to break
