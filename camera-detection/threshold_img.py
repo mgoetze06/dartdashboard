@@ -6,7 +6,7 @@ def nothing(x):
     pass
 
 # Load an image
-img = cv2.imread('C:\projects\DartDashboard\camera-detection\images\WIN_20240109_20_42_21_Pro.jpg')
+img = cv2.imread('C:\projects\DartDashboard\camera-detection\images\dslr_scheibe.JPG')
 
 # Resize The image
 if img.shape[1] > 600:

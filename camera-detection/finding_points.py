@@ -45,7 +45,7 @@ def click_event(event, x, y, flags, params):
 if __name__=="__main__": 
   
     # reading the image 
-    img = cv2.imread('C:\projects\DartDashboard\camera-detection\edges.png') 
+    img = cv2.imread('C:\projects\DartDashboard\camera-detection\warped_edges.png') 
   
     # displaying the image 
     cv2.imshow('image', img) 
