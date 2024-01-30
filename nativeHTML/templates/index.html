@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>albs-dart</title>
     <link rel="stylesheet" type="text/css" href="/static/style.css">
   </head>
@@ -97,7 +98,7 @@ function fordereSpielerwechsel(){
   function toggleDouble(){
     double = !double;
     triple = false;
-    document.getElementById("bull").disabled = false;
+    document.getElementById("bull").disabled = true;
     document.getElementById("bull").style.backgroundColor = "#ecedef";
     ColorsTripleDouble();
   }

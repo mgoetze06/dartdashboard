@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from skimage.filters import threshold_triangle
 from skimage import exposure
 
-debug = True
+debug = False
 points = []
 img_global = None
 #%matplotlib inline
