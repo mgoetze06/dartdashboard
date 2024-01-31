@@ -14,6 +14,7 @@
     var counter = 1;
     var überworfen = false;
     var wurf_nr = 0;
+    var type = "S";
     socket.on('spielstand_update', function(msg) {
       //$('#textBox').append('<p>Received: ' + msg.data + '</p>');
       document.getElementById('punkteSpieler1').value = msg.punktstand1;
@@ -117,69 +118,23 @@ function fordereSpielerwechsel(){
 
   }
 
-  function checkWinning(wertWurf,doubleOut,restwert){
-      //document.getElementById("debug").value = restwert-wertWurf;
-      if(restwert-wertWurf == 0 && doubleOut){
-          console.log("gewonnen");
-          return true;
-      }else{
-          console.log("nicht gewonnen");
-          return false;
-      }
-  }
+
   function sendWurf(object){
 
     var wert = object.value;
-    wurf_nr = wurf_nr + 1; 
-    überworfen = false;
+    type = "S";
     if(triple){
-        wert = wert * 3;
+        type = "T";
     }else{
         if(double){
-            wert = wert * 2;
+          type = "D";
         }
     }
+    socket.emit('wurf', {wert: wert, type: type});
 
-    if(spieler){
-      currentPunktstand = document.getElementById('punkteSpieler1').value
-      currentSpieler = "Spieler1";
-      andererSpieler = "Spieler2";
-
-
-    }else{
-      currentPunktstand = document.getElementById('punkteSpieler2').value
-      currentSpieler = "Spieler2";
-      andererSpieler = "Spieler1";
-    }
-    if(checkWinning(wert,double,currentPunktstand)){
-        document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "green";
-        var winningText = currentSpieler + " gewinnt!";
-        alert(winningText);
-    }else{
-      if(currentPunktstand - wert < 2){
-                    überworfen = true;
-                    socket.emit('ueberworfen', {data: wert, currentSpieler: currentSpieler});
-      }else{
-          socket.emit('wurf', {data: wert, currentSpieler: currentSpieler});
-      }
-      winner = false;
-    }
-    if(wurf_nr == 3 || überworfen){
-      //spieler = !spieler;
-      wurf_nr = 0;
-      //document.getElementsByClassName(andererSpieler)[0].style.backgroundColor = "#bfe0c4";
-      //document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "#ecedef";
-    }else{
-      //document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "#bfe0c4";
-      //document.getElementsByClassName(andererSpieler)[0].style.backgroundColor = "#ecedef";
-    }
-    document.getElementById('PunktEingabeFrei').value = "";
-    triple = false;
-    double = false;
-    document.getElementById("bull").style.backgroundColor = "#ecedef";
-    ColorsTripleDouble();
     //document.getElementById('sound1').play();
   }
+
   function noscore(){
     for(var i = (wurf_nr + 1); i < 4; i++){
       sendWurf(document.getElementById('zero'))
