@@ -67,6 +67,14 @@
 
         }
     });
+    socket.on('visit_score', function(msg) {
+        if(spieler){
+          document.getElementById("visitscoreSpieler1").value = msg.visit_score;
+        }else{
+          document.getElementById("visitscoreSpieler2").value = msg.visit_score;
+
+        }
+    });
     function sendZurueck(){
       socket.emit('zurueck');
 
@@ -159,6 +167,8 @@ function fordereSpielerwechsel(){
       }
       document.getElementById("avgSpieler1").value = "";
       document.getElementById("avgSpieler2").value = "";
+      document.getElementById("visitscoreSpieler1").value = "";
+      document.getElementById("visitscoreSpieler2").value = "";
       document.getElementById("double").style.backgroundColor = "#ecedef";
       document.getElementById("triple").style.backgroundColor = "#ecedef";
       document.getElementById("bull").disabled = false;

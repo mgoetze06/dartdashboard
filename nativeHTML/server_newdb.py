@@ -121,6 +121,20 @@ def ErmittleAndereID(currentID):
 #         nr = int(game_id) + 1
 #     return nr
 
+def sendeAufnahmeZuEinzelnenWürfen(aufnahme,id):
+    global database_path
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+    query = "select * from dartgame_details where Game_ID = " + str(game_id) + " and Spieler_ID = " + str(id) + " and Aufnahme = " + str(aufnahme) 
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    print(rows)
+    for i in range(len(rows)):
+        emit('wurf_historie',{'wurfnummer': str(i+1), 'wert': str(rows[i][8]) + str(rows[i][1])}, broadcast=True)
+    
+    emit('avg',{'avg': str(round(rows[-1][7],2))}, broadcast=True)
+    emit('visit_score',{'visit_score': str(rows[-1][6])}, broadcast=True)
+
 
 def LeseLetztenWurf(id=None):
     global database_path
@@ -164,6 +178,7 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
     print(letzterWurf)
     wurf_nummer_gesamt = letzterWurf.wurf_Nummer_Gesamt + 1
     rest = letzterWurf.wurf_Nummer_Gesamt % 3
+    print("rest: ", rest)
     if rest == 0:
         #Spielerwechsel
         print("Spielerwechsel")
@@ -217,6 +232,24 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
     print("###---###---###---###")
     print("Neuer Wurf: ")
     print(w)
+
+
+    sendeAufnahmeZuEinzelnenWürfen(aufnahme,neuerWurf_id)
+
+
+    if rest == 2:
+        #spieler wirft den dritten dart einer aufnahme, anschließend schaltet die UI auf spielerwechsel
+        #spielerwechsel (UI) erfolgt bereits vor dem Wurf des neuen Spielers
+        id  = ErmittleAndereID(neuerWurf_id)
+        if id == 1:
+            emit('spieler_wechsel', {'spieler': 'Spieler1'}, broadcast=True)
+        else:
+            emit('spieler_wechsel', {'spieler': 'Spieler2'}, broadcast=True)
+
+
+        #lösche die letzten drei würfe vom neuen spieler, da neue aufnahme
+
+
 
 
     return
