@@ -309,7 +309,12 @@ def UpdateSpielstand():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index_rework.html')
+
+@app.route('/fullscreen')
+def fullscreen():
+    """Video streaming home page."""
+    return render_template('fullscreen.html')
 
 @socketio.on('message')
 def handle_message(data):
