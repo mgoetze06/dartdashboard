@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>albs-dart</title>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
+  </head>
+  <script type="text/javascript" src="/static/script.js"> </script>
+
+<body>
+        <!-- Trigger/Open The Modal -->
+    <button id="myBtn" onclick="openModal()">Open Modal</button>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <button onclick="sendBroadcast()">Spiel starten</button>
+        <button onclick="location.href='/fullscreen'">Vollbild Video</button>
+    </div>
+
+    </div>
+    <div id="center">
+          <table id="calcu" width="100%">
+              <tr>
+                  <td><input type="button" class="buttonValues" value="1" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="2" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="3" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="4" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="5" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="6" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="7" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+    
+              </tr>
+              <tr>
+                  <td><input type="button" class="buttonValues" value="8" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="9" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="10" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="11" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="12" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="13" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="14" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+              </tr>
+              <tr>
+                  <td><input type="button" class="buttonValues" value="15" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="16" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="17" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="18" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="19" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="20" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="25" onclick="sendWurf(this)" id="bull"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+              </tr>
+              <tr>
+                  <td colspan="3"><input type="button" class="buttonValues" value="0" id="zero" onclick="sendWurf(this)"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td colspan="2"><input type="button" class="buttonValues" value="Double" onclick="toggleDouble()" id="double"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td colspan="2"><input type="button" class="buttonValues" value="Triple" onclick="toggleTriple()" id="triple"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <!--<td colspan="2"><input type="button" class="buttonValues" value="Zurück" disabled="true" onclick="sendZurueck()"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>-->
+              </tr>
+          </table>
+      </div>
+    
+</body>
+</html>
