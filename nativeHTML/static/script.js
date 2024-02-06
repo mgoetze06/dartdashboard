@@ -170,7 +170,7 @@ function fordereSpielerwechsel(){
     //SPIEL STARTEN
     if (confirm("Spiel starten?") == true) {
         //text = "You pressed OK!";
-      
+      closeModal()
       counter++;
       socket.emit('init event', {data: counter});
       document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
