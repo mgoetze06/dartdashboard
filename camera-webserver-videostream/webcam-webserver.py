@@ -2,7 +2,7 @@ import cv2
 from flask import Flask, render_template, Response
 import time
 
-camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture("/dev/video14")
 #camera = cv2.VideoCapture(0,cv2.CAP_DSHOW)
 #fourcc = cv2.VideoWriter_fourcc(*'XVID')
 print("Frame default resolution: (" + str(camera.get(cv2.CAP_PROP_FRAME_WIDTH)) + "; " + str(camera.get(cv2.CAP_PROP_FRAME_HEIGHT)) + ")")
@@ -43,5 +43,5 @@ def index():
     return render_template('fullscreen1.html')
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=8100)
     #app.run(debug=False)
