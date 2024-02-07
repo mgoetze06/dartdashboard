@@ -1,0 +1,25 @@
+[Unit]
+Description=Shutting Down the Device when battery is discharging
+After=network.target
+
+[Service]
+WorkingDirectory=/home/boris/webserver
+ExecStart=/usr/bin/python3 /home/boris/webserver/poweroff.py
+
+[Install]
+WantedBy=multi-user.target
+
+######################################################################################
+
+[Unit]
+Description=Getting Usb Camera Input and Serving Flask Webserver
+After=network.target
+
+[Service]
+WorkingDirectory=/home/boris/webserver
+ExecStart=/usr/bin/python3 /home/boris/webserver/webcam-webserver.py
+User=boris
+
+[Install]
+WantedBy=multi-user.target
+
