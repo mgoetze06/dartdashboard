@@ -17,6 +17,20 @@
 
   }
 
+  .wurf{
+    border: none;  
+    background: #d4d4d4;
+    color: #000000; 
+    font-size: 24px;  
+    font-weight: 200;
+    width: 25%;
+  }
+
+  .inputbox{
+    max-width: 80px;
+    width: 25%;
+  }
+
   .punktstand{
     height: 120px;
     font-size: 120px;  
@@ -57,6 +71,11 @@
       height: 80px;
       font-size: 80px;  
     }
+    .wurf{
+      font-size: 16px;  
+      font-weight: 150;
+    }
+
   }
 
   .normalButton{
