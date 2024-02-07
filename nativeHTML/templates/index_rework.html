@@ -19,7 +19,8 @@
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
         <button onclick="sendBroadcast()">Spiel starten</button>
-        <button onclick="location.href='/fullscreen'">Vollbild Video</button>
+        <button onclick="location.href='/fullscreen'">Vollbild Video</button><br>
+        <img src="http://192.168.0.213:8100/video_feed_1" width="50%">
     </div>
 
     </div>
@@ -27,18 +28,23 @@
         <table id="calcu" width="100%">
             <tr>
                 <td colspan="3" width="75%">Spieler1</td>
-                <td width="25%"><input class="wurf" type="text" readonly id="avgSpieler1"></td>
+                <td></td>
             </tr>
             <tr>
                 <td colspan="3" width="75%"><input class="punktstand" type="text" readonly id="punkteSpieler1"></td>
-                <td width="25%"><input class="wurf" type="text" readonly id="dartscount1"></td>
+                <td class="wurf ">
+                    Darts: <input class="wurf inputbox" type="text" readonly id="dartscount1"> <br>
+                
+                    Avg: <input class="wurf inputbox" type="text" readonly id="avgSpieler1"><br>
+                    Aufn.: <input class="wurf inputbox" type="text" readonly id="visitscoreSpieler1">
+                </td>
             </tr>                
 
             <tr>
-                <td width="25%"><input class="wurf" type="text" readonly id="wurf11"></td>
-                <td width="25%"><input class="wurf" type="text" readonly id="wurf12"></td>
-                <td width="25%"><input class="wurf" type="text" readonly id="wurf13"></td>
-                <td width="25%"><input class="wurf" type="text" readonly id="visitscoreSpieler1"></td>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf11"></td>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf12"></td>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf13"></td>
+                <td></td>
             </tr>
         </table>    
     </div>
@@ -46,18 +52,23 @@
         <table id="calcu" width="100%">
             <tr>
                 <td colspan="3" width="75%">Spieler2</td>
-                <td width="25%"><input class="wurf" type="text" readonly id="avgSpieler2"></td>
+                <td></td>
             </tr>
             <tr>
                 <td colspan="3" width="75%"><input class="punktstand" type="text" readonly id="punkteSpieler2"></td>
-                <td width="25%"><input class="wurf" type="text" readonly id="dartscount2"></td>
+                <td class="wurf ">
+                    Darts: <input class="wurf inputbox" type="text" readonly id="dartscount2"> <br>
+                
+                    Avg: <input class="wurf inputbox" type="text" readonly id="avgSpieler2"><br>
+                    Aufn.: <input class="wurf inputbox" type="text" readonly id="visitscoreSpieler2">
+                </td>
             </tr>                
 
             <tr>
-                <td width="25%"><input class="wurf" type="text" readonly id="wurf21"></td>
-                <td width="25%"><input class="wurf" type="text" readonly id="wurf22"></td>
-                <td width="25%"><input class="wurf" type="text" readonly id="wurf23"></td>
-                <td width="25%"><input class="wurf" type="text" readonly id="visitscoreSpieler2"></td>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf21"></td>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf22"></td>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf23"></td>
+                <td></td>
             </tr>
         </table>    
     </div>
