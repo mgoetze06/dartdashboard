@@ -129,10 +129,14 @@ def sendeAufnahmeZuEinzelnenWürfen(aufnahme,id):
     cursor.execute(query)
     rows = cursor.fetchall()
     print(rows)
-    for i in range(len(rows)):
-        emit('wurf_historie',{'wurfnummer': str(i+1), 'wert': str(rows[i][8]) + str(rows[i][1])}, broadcast=True)
+
     
-    emit('avg',{'avg': str(round(rows[-1][7],2))}, broadcast=True)
+
+
+    for i in range(len(rows)):
+        emit('wurf_historie',{'wurfnummer': str(i+1), 'wert': str(rows[i][8]) + str(rows[i][1]), 'spielerid': str(id)}, broadcast=True)
+    
+    emit('avg',{'avg': str(round(rows[-1][7],2)),'dartscount': str(rows[-1][0]), 'spielerid': str(id)}, broadcast=True)
     emit('visit_score',{'visit_score': str(rows[-1][6])}, broadcast=True)
 
 
@@ -211,6 +215,8 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
     
     if (letzterWurf.punktstand - numerischerWertWurf)<2:
         error = 1
+        punktstand = letzterWurf.punktstand
+        punktstand_inv = 501 - punktstand
     else:
         error = 0
         punktstand = letzterWurf.punktstand - numerischerWertWurf

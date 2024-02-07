@@ -38,11 +38,7 @@ var socket = io();
 
     });
     socket.on('wurf_historie', function(msg) {
-      if(spieler){
-        wurf_id = "wurf1" + msg.wurfnummer;
-      }else{
-        wurf_id = "wurf2" + msg.wurfnummer;
-      }
+      wurf_id = "wurf" + msg.spielerid + msg.wurfnummer;
       document.getElementById(wurf_id).value = msg.wert;
       if(msg.wert.startsWith("E")){
         document.getElementById(wurf_id).style.backgroundColor = "Red";
@@ -76,12 +72,17 @@ var socket = io();
         socket.emit('my event', {data: 'I\'m connected!'});
     });
     socket.on('avg', function(msg) {
-        if(spieler){
-          document.getElementById("avgSpieler1").value = msg.avg;
-        }else{
-          document.getElementById("avgSpieler2").value = msg.avg;
 
-        }
+        var id = "avgSpieler" + msg.spielerid;
+        console.log(id);
+        document.getElementById(id).value = msg.avg;
+
+        id = "dartscount" + msg.spielerid;
+        console.log(id);
+
+        document.getElementById(id).value = msg.dartscount;
+
+
     });
     socket.on('visit_score', function(msg) {
         if(spieler){
@@ -186,6 +187,8 @@ function fordereSpielerwechsel(){
       document.getElementById("avgSpieler2").value = "";
       document.getElementById("visitscoreSpieler1").value = "";
       document.getElementById("visitscoreSpieler2").value = "";
+      document.getElementById("dartscount1").value = "";
+      document.getElementById("dartscount2").value = "";
       document.getElementById("double").style.backgroundColor = "#ecedef";
       document.getElementById("triple").style.backgroundColor = "#ecedef";
       document.getElementById("bull").disabled = false;
