@@ -128,12 +128,16 @@ def sendeAufnahmeZuEinzelnenWürfen(aufnahme,id):
     query = "select * from dartgame_details where Game_ID = " + str(game_id) + " and Spieler_ID = " + str(id) + " and Aufnahme = " + str(aufnahme) 
     cursor.execute(query)
     rows = cursor.fetchall()
-    print(rows)
+    #print(rows)
 
     
 
 
     for i in range(len(rows)):
+  #      if rows[i][8] == 1:
+ #           emit('wurf_historie',{'wurfnummer': str(i+1), 'wert': 'E' + str(rows[i][1]), 'spielerid': str(id)}, broadcast=True)
+#
+        #else:
         emit('wurf_historie',{'wurfnummer': str(i+1), 'wert': str(rows[i][8]) + str(rows[i][1]), 'spielerid': str(id)}, broadcast=True)
     
     emit('avg',{'avg': str(round(rows[-1][7],2)),'dartscount': str(rows[-1][0]), 'spielerid': str(id)}, broadcast=True)
@@ -215,6 +219,7 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
     
     if (letzterWurf.punktstand - numerischerWertWurf)<2:
         error = 1
+        neuerWurf_Typ = 'E' + neuerWurf_Typ
         punktstand = letzterWurf.punktstand
         punktstand_inv = 501 - punktstand
     else:
@@ -235,6 +240,21 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
     w = Wurf(wurf_nummer,neuerWurf_Wert,aufnahme,error,punktstand,punktstand_inv,wurf_gesamt,avg,neuerWurf_Typ,neuerWurf_id,game_id,wurf_nummer_gesamt)
     w.insert()
     
+    if(error):
+        print("Fehler!")
+        print(wurf_nummer)
+        rest = wurf_nummer % 3
+        print(rest)
+        fehlwürfe_auffüllen = 3-rest
+        while(fehlwürfe_auffüllen>0):
+            print("fülle fehlwurf in aufnahme hinzu")
+            fehlwürfe_auffüllen -= 1
+            wurf_nummer += 1
+            neuerWurf_Wert = 0
+            wurf_nummer_gesamt += 1
+            neuerWurf_Typ = 'E'
+            w = Wurf(wurf_nummer,neuerWurf_Wert,aufnahme,error,punktstand,punktstand_inv,wurf_gesamt,avg,neuerWurf_Typ,neuerWurf_id,game_id,wurf_nummer_gesamt)
+            w.insert()
     print("###---###---###---###")
     print("Neuer Wurf: ")
     print(w)
@@ -243,7 +263,7 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
     sendeAufnahmeZuEinzelnenWürfen(aufnahme,neuerWurf_id)
 
 
-    if rest == 2:
+    if rest == 2 or error:
         #spieler wirft den dritten dart einer aufnahme, anschließend schaltet die UI auf spielerwechsel
         #spielerwechsel (UI) erfolgt bereits vor dem Wurf des neuen Spielers
         id  = ErmittleAndereID(neuerWurf_id)
