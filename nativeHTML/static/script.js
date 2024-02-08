@@ -115,6 +115,17 @@ function fordereSpielerwechsel(){
     socket.emit('message', {data: 'I\'m connected!'});
 
   }
+
+  function turnOffDoubleTriple(){
+    document.getElementById("bull").disabled = false;
+    document.getElementById("bull").style.backgroundColor = "#ecedef";
+
+    document.getElementById("double").style.backgroundColor = "#ecedef";
+    document.getElementById("triple").style.backgroundColor = "#ecedef";
+    double = false;
+    triple = false;
+  }
+
   function toggleTriple(){
     triple = !triple;
     double = false;
@@ -125,14 +136,16 @@ function fordereSpielerwechsel(){
   function toggleDouble(){
     double = !double;
     triple = false;
-    document.getElementById("bull").disabled = true;
-    document.getElementById("bull").style.backgroundColor = "#ecedef";
     ColorsTripleDouble();
   }
 
   function ColorsTripleDouble(){
     document.getElementById("double").style.backgroundColor = "#ecedef";
     document.getElementById("triple").style.backgroundColor = "#ecedef";
+    document.getElementById("bull").disabled = false;
+    document.getElementById("bull").style.backgroundColor = "#ecedef";
+
+
     if(double){
       document.getElementById("double").style.backgroundColor = "red";
     }
@@ -157,7 +170,7 @@ function fordereSpielerwechsel(){
         }
     }
     socket.emit('wurf', {wert: wert, type: type});
-
+    turnOffDoubleTriple();
     //document.getElementById('sound1').play();
   }
 
@@ -176,7 +189,7 @@ function fordereSpielerwechsel(){
       socket.emit('init event', {data: counter});
       document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
       document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#ecedef";
-      document.getElementById('PunktEingabeFrei').value = "";
+      //document.getElementById('PunktEingabeFrei').value = "";
       for(var i = 1; i < 4; i++){
               wurf_id = "wurf1" + i;
               wurf_id2 = "wurf2" + i;
