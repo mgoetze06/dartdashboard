@@ -144,25 +144,61 @@ def sendeAufnahmeZuEinzelnenWürfen(aufnahme,id):
     emit('visit_score',{'visit_score': str(rows[-1][6])}, broadcast=True)
 
 
-def LeseLetztenWurf(id=None):
+def SchreibeGesamteAufnahmeAlsFehler(aufnahme,id):
     global database_path
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
+    query = "Update dartgame_details set Fehler = 1 where Game_ID = " + str(game_id) + " and Spieler_ID = " + str(id) + " and Aufnahme = "+ str(aufnahme)
+    cursor.execute(query)
+    connection.commit()
+
+
+def LeseLetztenWurf(id=None,excludeErrors=False):
+    global database_path
+
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
     if id==None:
-        query = "select * from dartgame_details where Game_ID = " + str(game_id) + " and Wurf_Nummer_Gesamt = (select MAX(Wurf_Nummer_Gesamt) from dartgame_details where Game_ID = " + str(game_id) + ")"
+        excludeErrors = False
+        query = "select * from dartgame_details where Game_ID = " + str(game_id) + " and Aufnahme = (select MAX(Aufnahme) from dartgame_details where Game_ID = " + str(game_id) + ")"
     else:
-        query = "select * from dartgame_details where Game_ID = " + str(game_id) + " and Spieler_ID = " + str(id) + " and Wurf_Nummer = (select MAX(Wurf_Nummer) from dartgame_details where Game_ID = " + str(game_id) + " and Spieler_ID = " + str(id) + ")"
+        query = "select * from dartgame_details where Game_ID = " + str(game_id) + " and Spieler_ID = " + str(id) + " and Aufnahme = (select MAX(Aufnahme) from dartgame_details where Game_ID = " + str(game_id) + " and Spieler_ID = " + str(id) + ")"
 
     cursor.execute(query)
-    row = cursor.fetchone()
+    row = cursor.fetchall()
 
-    if row == None:
+    if row == None or len(row)==0:
         #erster Wurf
         letzterWurf = Wurf(0,0,-1,0,501,0,0,0,None,None,game_id,0)
     
     else:
-        letzterWurf = Wurf(row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],row[11])
-        
+        row_single = row[-1]
+        if excludeErrors:
+            validAufnahmeFound = False
+            while(validAufnahmeFound == False):
+                errorCount = 0
+
+                for i in range(len(row)):
+                    errorCount = errorCount + row[i][3]
+
+                if errorCount == 0:
+
+                    validAufnahmeFound = True
+
+                else:
+                    validAufnahmeFound = False
+                    nächsteaufnahme = row[0][2] - 1
+                    query = "select * from dartgame_details where Game_ID = " + str(game_id) + " and Spieler_ID = " + str(id) + " and Aufnahme = " + str(nächsteaufnahme)
+
+                    cursor.execute(query)
+                    row = cursor.fetchall()
+
+                row[-1][2] = row_single[2]
+                row_single = row[-1]
+        letzterWurf = Wurf(row_single[0],row_single[1],row_single[2],row_single[3],row_single[4],row_single[5],row_single[6],row_single[7],row_single[8],row_single[9],row_single[10],row_single[11])
+
+
+
     return letzterWurf
 
 
@@ -245,21 +281,26 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
         print(wurf_nummer)
         rest = wurf_nummer % 3
         print(rest)
-        fehlwürfe_auffüllen = 3-rest
-        while(fehlwürfe_auffüllen>0):
-            print("fülle fehlwurf in aufnahme hinzu")
-            fehlwürfe_auffüllen -= 1
-            wurf_nummer += 1
-            neuerWurf_Wert = 0
-            wurf_nummer_gesamt += 1
-            neuerWurf_Typ = 'E'
-            w = Wurf(wurf_nummer,neuerWurf_Wert,aufnahme,error,punktstand,punktstand_inv,wurf_gesamt,avg,neuerWurf_Typ,neuerWurf_id,game_id,wurf_nummer_gesamt)
-            w.insert()
+        if rest > 0:
+            fehlwürfe_auffüllen = 3-rest
+            while(fehlwürfe_auffüllen>0):
+                print("fülle fehlwurf in aufnahme hinzu")
+                fehlwürfe_auffüllen -= 1
+                wurf_nummer += 1
+                neuerWurf_Wert = 0
+                wurf_nummer_gesamt += 1
+                neuerWurf_Typ = 'E'
+                w = Wurf(wurf_nummer,neuerWurf_Wert,aufnahme,error,punktstand,punktstand_inv,wurf_gesamt,avg,neuerWurf_Typ,neuerWurf_id,game_id,wurf_nummer_gesamt)
+                w.insert()
+
+
+        SchreibeGesamteAufnahmeAlsFehler(aufnahme,neuerWurf_id)
+
     print("###---###---###---###")
     print("Neuer Wurf: ")
     print(w)
 
-
+    rest = wurf_nummer % 3
     sendeAufnahmeZuEinzelnenWürfen(aufnahme,neuerWurf_id)
 
 
