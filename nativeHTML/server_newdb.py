@@ -12,6 +12,8 @@ headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
 debug = False
 
+ESPAvailable = False
+
 spieler = "Spieler1"
 
 last_committed_punktstand1 = 501
@@ -159,7 +161,7 @@ def LeseLetztenWurf(id=None,excludeErrors=False):
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
     if id==None:
-        excludeErrors = False
+        #excludeErrors = False
         query = "select * from dartgame_details where Game_ID = " + str(game_id) + " and Aufnahme = (select MAX(Aufnahme) from dartgame_details where Game_ID = " + str(game_id) + ")"
     else:
         query = "select * from dartgame_details where Game_ID = " + str(game_id) + " and Spieler_ID = " + str(id) + " and Aufnahme = (select MAX(Aufnahme) from dartgame_details where Game_ID = " + str(game_id) + " and Spieler_ID = " + str(id) + ")"
@@ -174,6 +176,10 @@ def LeseLetztenWurf(id=None,excludeErrors=False):
     else:
         row_single = row[-1]
         if excludeErrors:
+            aufnahme = row_single[2]
+            wurf_nr = row_single[0]
+            wurf_nr_gesamt = row_single[11]
+
             validAufnahmeFound = False
             while(validAufnahmeFound == False):
                 errorCount = 0
@@ -193,9 +199,15 @@ def LeseLetztenWurf(id=None,excludeErrors=False):
                     cursor.execute(query)
                     row = cursor.fetchall()
 
-                row[-1][2] = row_single[2]
-                row_single = row[-1]
-        letzterWurf = Wurf(row_single[0],row_single[1],row_single[2],row_single[3],row_single[4],row_single[5],row_single[6],row_single[7],row_single[8],row_single[9],row_single[10],row_single[11])
+            #row[-1][2] = row_single[2] #aufnahme
+            #row[-1][0] = row_single[0] #wurfnr
+            #row[-1][11] = row_single[11] #wurfnrgesamt
+
+
+            row_single = row[-1]
+            letzterWurf = Wurf(wurf_nr,row_single[1],aufnahme,row_single[3],row_single[4],row_single[5],row_single[6],row_single[7],row_single[8],row_single[9],row_single[10],wurf_nr_gesamt)
+        else:
+            letzterWurf = Wurf(row_single[0],row_single[1],row_single[2],row_single[3],row_single[4],row_single[5],row_single[6],row_single[7],row_single[8],row_single[9],row_single[10],row_single[11])
 
 
 
@@ -218,7 +230,7 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
 
     print("Lese letzten Wurf...")
 
-    letzterWurf = LeseLetztenWurf()
+    letzterWurf = LeseLetztenWurf(excludeErrors=True)
     print(letzterWurf)
     wurf_nummer_gesamt = letzterWurf.wurf_Nummer_Gesamt + 1
     rest = letzterWurf.wurf_Nummer_Gesamt % 3
@@ -227,7 +239,7 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
         #Spielerwechsel
         print("Spielerwechsel")
         neuerWurf_id = ErmittleAndereID(letzterWurf.spieler_ID)
-        letzterWurf = LeseLetztenWurf(neuerWurf_id)
+        letzterWurf = LeseLetztenWurf(neuerWurf_id,True)
         
         print("letzter Wurf vom anderen Spieler: ")
         print(letzterWurf)
@@ -271,7 +283,7 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
 
         wurf_gesamt = letzterWurf.wurf_Gesamt + numerischerWertWurf
 
-    avg = punktstand_inv / wurf_nummer
+    avg = punktstand_inv / (aufnahme+1)
 
     w = Wurf(wurf_nummer,neuerWurf_Wert,aufnahme,error,punktstand,punktstand_inv,wurf_gesamt,avg,neuerWurf_Typ,neuerWurf_id,game_id,wurf_nummer_gesamt)
     w.insert()
@@ -279,10 +291,10 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
     if(error):
         print("Fehler!")
         print(wurf_nummer)
-        rest = wurf_nummer % 3
-        print(rest)
-        if rest > 0:
-            fehlwürfe_auffüllen = 3-rest
+        rest_2 = wurf_nummer % 3
+        print(rest_2)
+        if rest_2 > 0:
+            fehlwürfe_auffüllen = 3-rest_2
             while(fehlwürfe_auffüllen>0):
                 print("fülle fehlwurf in aufnahme hinzu")
                 fehlwürfe_auffüllen -= 1
@@ -300,7 +312,7 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
     print("Neuer Wurf: ")
     print(w)
 
-    rest = wurf_nummer % 3
+    #rest = wurf_nummer % 3
     sendeAufnahmeZuEinzelnenWürfen(aufnahme,neuerWurf_id)
 
 
@@ -346,15 +358,17 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
 
 def SendSpielstandToESP(data):
     global url,headers
-    try:
-        requests.post(url, data=json.dumps(data), headers=headers,timeout=0.5)
-    except requests.Timeout:
-        pass
+    global ESPAvailable
+    if ESPAvailable:
+        try:
+            requests.post(url, data=json.dumps(data), headers=headers,timeout=0.5)
+        except requests.Timeout:
+            pass
 
 def UpdateSpielstand():
 
-    p1 = LeseLetztenWurf(1)
-    p2 = LeseLetztenWurf(2)
+    p1 = LeseLetztenWurf(1,True)
+    p2 = LeseLetztenWurf(2,True)
 
 
 
@@ -434,12 +448,13 @@ def initGame():
     emit('spielstand_update', {'punktstand1': 501,'punktstand2': 501}, broadcast=True)
     connection.close()
 
-    global url,headers
-    data = {'punkte0': '501', 'punkte1': '501', 'spieler': '0'}
-    try:
-        requests.post(url, data=json.dumps(data), headers=headers,timeout=0.5)
-    except requests.Timeout:
-        pass
+    if ESPAvailable:
+        global url,headers
+        data = {'punkte0': '501', 'punkte1': '501', 'spieler': '0'}
+        try:
+            requests.post(url, data=json.dumps(data), headers=headers,timeout=0.5)
+        except requests.Timeout:
+            pass
 
 if __name__ == '__main__':
     #InitDetails();
