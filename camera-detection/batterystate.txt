@@ -1,0 +1,12 @@
+upower -e
+upower -i /org/freedesktop/UPower/devices/battery_BAT1
+
+
+
+
+import subprocess
+subprocess.call(["upower", "-i", "/org/freedesktop/UPower/devices/battery_BAT1"])
+
+
+subprocess.call(["systemctl", "poweroff", "-i"])
+

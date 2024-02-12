@@ -1,100 +1,82 @@
-  /* @media (hover: hover) {
-    input[type=button]:hover{
-        background: #a4a4a7; 
-        transition: 200ms;
-    }
-  } */
-  .wurf{
-      width: 25%; 
-      font-size: 32px;  
-      border-radius: 10%; 
-      box-sizing: border-box;
-      background: none;
-      line-height: 0px;  
-      border: none; 
-      font-weight: 500; 
-      text-align: center; 
-  }
-  .punktstand{
-      font-size: 120px; 
-      width: 40%;  
-      text-align: center;
-      border-radius: 10%; 
-      box-sizing: border-box;
-      color: #235558;   
-      line-height: 0px;  
-      font-weight: 1000; 
-      border: none;  
-      background: none;
-  }
-  .average{
-      width: 15%; 
-      font-size: 20px;  
-      border-radius: 10%; 
-      box-sizing: border-box;
-      background: none;
-      line-height: 0px;  
-      border: none; 
-      font-weight: 100; 
-      text-align: right; 
-  }
   .buttonValues:active{
     color: #3a2222;  
   }
   .buttonValues{
-    width: 100%;   
+    width: 100%;
     height: 100px;
-    margin-right: 15px;  
     background: #ecedef;  
     border: none;  
     font-size: 30px;  
-    line-height: 30px;  
-    border-radius: 10px;  
+    border-radius: 1px;  
     font-weight: 700;  
     color: #235558;  
     cursor: pointer;    
   }
-  .buttonNormal{
-    width: 100%;   
-    height: 70px;
-    margin-right: 15px;  
-    background: #ecedef;  
-    border: none;  
-    font-size: 24px;  
-    line-height: 30px;  
-    border-radius: 10px;  
-    font-weight: 350;  
-    color: #235558;  
-    cursor: pointer;    
+  .menu{
+    height: 40px;
+
   }
+
+  .wurf{
+    border: none;  
+    background: #d4d4d4;
+    color: #000000; 
+    font-size: 24px;  
+    font-weight: 200;
+  }
+
+  .inputbox{
+    max-width: 80px;
+    width: 50%;
+  }
+
+  .punktstand{
+    height: 120px;
+    font-size: 120px;  
+    border-radius: 1px;  
+    font-weight: 1000;  
+    width: 100%;
+    box-sizing: border-box;
+    border: none;  
+    background: none;
+    color: #235558; 
+  }
+
+  #spieler {
+    margin: auto;
+    width: 40%;
+    overflow: hidden;
+    
+
+    }
   #center {
     margin: auto;
     width: 40%;
     overflow: hidden;
-    }
-  @media (max-width: 1100px) {
-    #center {
+    
 
+    }
+  @media only screen and (max-width: 600px) {
+    #center {
+      left: 0%;
+      position: fixed; 
+      bottom:0%;
       width: 100%;
       }
-      .buttonValues:active{
-        color: #3a2222;  
-      }
+    #spieler {
+      width: 100%;
+    }
+    .punktstand{
+      height: 80px;
+      font-size: 80px;  
+    }
+    .wurf{
+      font-size: 16px;  
+      font-weight: 150;
+    }
 
-      .buttonValues{ 
-        height: 270px;
-        font-size: 60px;
-      }
-      .wurf{
-        font-size: 50px;
-      }
   }
 
-  .spieler {
-    width: 100%;
-    margin-top: 0px;
-    padding: 0px;
-  }
   .normalButton{
     width: 100%;
     margin: 5px;  
@@ -108,3 +90,43 @@
     color: #235558;  
     cursor: pointer;    
   }
+
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+/* The Close Button */
+.close {
+  color: #aaaaaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
