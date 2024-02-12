@@ -424,7 +424,7 @@ def UpdateSpielstand():
 
 @app.route('/')
 def index():
-    return render_template('index_rework.html')
+    return render_template('index.html')
 
 @app.route('/fullscreen')
 def fullscreen():
@@ -447,14 +447,23 @@ def handle_message(data):
         InsertWurf(int(data["wert"]),data["type"])
         UpdateSpielstand()
 
+@socketio.on('zurueck')
+def handle_zurueck():
+    global database_path
 
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+    query = "delete from dartgame_details where Game_ID = " + str(game_id) + " and Wurf_Nummer_Gesamt = (select MAX(Wurf_Nummer_Gesamt) from dartgame_details where Game_ID = " + str(game_id) + ")"
+    cursor.execute(query)
+    connection.commit()
 
+    UpdateSpielstand()
 @socketio.on('init event')
 def test_message(message):
     initGame()
 
 def initGame():
-    global database_path, game_id
+    global database_path, game_id, winner
     connection = sqlite3.connect(database_path)
 
     cursor = connection.cursor()
@@ -475,7 +484,7 @@ def initGame():
     query = "INSERT INTO dartgame_header ('Game_ID','Typ','Typ_Punktstand','Spieler1_ID','Spieler2_ID','Spieler1_Name','Spieler2_Name','Ergebnis','Startzeit')"
     query = query +  "VALUES ("+ str(game_id) + ",'DoubleOut',501,1,2,'Lini','Rici','läuft','" + time + "')"
 
-
+    winner = None
     cursor.execute(query)
 
     connection.commit()
