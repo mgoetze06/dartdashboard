@@ -19,6 +19,8 @@ var socket = io();
     function closeModal() {
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
+        //var modal = document.getElementById("winnerModal");
+        //modal.style.display = "none";
     }
     
     // When the user clicks anywhere outside of the modal, close it
@@ -28,6 +30,11 @@ var socket = io();
       if (event.target == modal) {
         modal.style.display = "none";
       }
+
+      //var modal = document.getElementById("winnerModal");
+      //if (event.target == modal) {
+      //  modal.style.display = "none";
+      // }
     }
 
 
@@ -43,6 +50,19 @@ var socket = io();
       if(msg.wert.startsWith("E")){
         document.getElementById(wurf_id).style.backgroundColor = "Red";
       }
+    });
+
+    socket.on('winner', function(msg) {
+      //var modal = document.getElementById("winnerModal");
+      //modal.style.display = "block";
+
+      //document.getElementById('Winner').value = msg.winner;
+      //document.getElementById('WinnerAvg').value = msg.avg;
+      //document.getElementById('WinnerDarts').value = msg.darts;
+
+      var id = "Spieler" + msg.winner;
+      document.getElementsByClassName(id)[0].style.backgroundColor = "green";
+
     });
 
     socket.on('spieler_wechsel', function(msg) {
