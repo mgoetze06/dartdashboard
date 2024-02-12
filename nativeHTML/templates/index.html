@@ -1,322 +1,128 @@
 <!doctype html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>albs-dart</title>
     <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
   </head>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
-  <script type="text/javascript" charset="utf-8">
-    var socket = io();
-    var double = false;
-    var triple = false;
-    var spieler = true;
-    var counter = 1;
-    var überworfen = false;
-    var wurf_nr = 0;
-    socket.on('spielstand_update', function(msg) {
-      //$('#textBox').append('<p>Received: ' + msg.data + '</p>');
-      document.getElementById('punkteSpieler1').value = msg.punktstand1;
-      document.getElementById('punkteSpieler2').value = msg.punktstand2;
-
-    });
-    socket.on('wurf_historie', function(msg) {
-      if(spieler){
-        wurf_id = "wurf1" + msg.wurfnummer;
-      }else{
-        wurf_id = "wurf2" + msg.wurfnummer;
-      }
-      document.getElementById(wurf_id).value = msg.wert;
-      if(msg.wert.startsWith("E")){
-        document.getElementById(wurf_id).style.backgroundColor = "Red";
-      }
-    });
-
-    socket.on('spieler_wechsel', function(msg) {
-      //$('#textBox').append('<p>Received: ' + msg.data + '</p>');
-      if (msg.spieler == "Spieler1"){
-        spieler = true;
-        
-        wurf_id_pre = "wurf1"
-        var spielerindex = "0"
-        document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
-        document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#ecedef";
-      }else{
-        spieler = false;
-        wurf_id_pre = "wurf2"
-        var spielerindex = "1"
-        document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#ecedef";
-        document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#bfe0c4";
-        }
-        //socket.emit('spielerwechselZumESP', {data: spielerindex});
-        for(var i = 1; i < 4; i++){
-            wurf_id = wurf_id_pre + i
-            document.getElementById(wurf_id).value = "";
-            document.getElementById(wurf_id).style.backgroundColor = null;
-        }
-    });
-    socket.on('connect', function() {
-        socket.emit('my event', {data: 'I\'m connected!'});
-    });
-    socket.on('avg', function(msg) {
-        if(spieler){
-          document.getElementById("avgSpieler1").value = msg.avg;
-        }else{
-          document.getElementById("avgSpieler2").value = msg.avg;
-
-        }
-    });
-    function sendZurueck(){
-      socket.emit('zurueck');
-
-    }
-
-  function sendekorrektur(object,spielerkorrektur){
-    var confirmtext = "Korrektur " + object.value + " für " + spielerkorrektur + " durchführen?"
-    if (confirm(confirmtext) == true) {
-      socket.emit('korrektur', {data: object.value, currentSpieler: spielerkorrektur});
-    }
-    
-  }
-
-function fordereSpielerwechsel(){
-  socket.emit('fordereSpielerwechsel', {data: "wechsel"});
-
-}
-
-  function sendData(object){
-    socket.emit('message', {data: 'I\'m connected!'});
-
-  }
-  function toggleTriple(){
-    triple = !triple;
-    double = false;
-    document.getElementById("bull").disabled = false;
-    document.getElementById("bull").style.backgroundColor = "#ecedef";
-    ColorsTripleDouble();
-  }
-  function toggleDouble(){
-    double = !double;
-    triple = false;
-    document.getElementById("bull").disabled = false;
-    document.getElementById("bull").style.backgroundColor = "#ecedef";
-    ColorsTripleDouble();
-  }
-
-  function ColorsTripleDouble(){
-    document.getElementById("double").style.backgroundColor = "#ecedef";
-    document.getElementById("triple").style.backgroundColor = "#ecedef";
-    if(double){
-      document.getElementById("double").style.backgroundColor = "red";
-    }
-    if(triple){
-      document.getElementById("triple").style.backgroundColor = "red";
-      document.getElementById("bull").disabled = true;
-      document.getElementById("bull").style.backgroundColor = "#3d3d3d";
-    }
-
-  }
-
-  function checkWinning(wertWurf,doubleOut,restwert){
-      //document.getElementById("debug").value = restwert-wertWurf;
-      if(restwert-wertWurf == 0 && doubleOut){
-          console.log("gewonnen");
-          return true;
-      }else{
-          console.log("nicht gewonnen");
-          return false;
-      }
-  }
-  function sendWurf(object){
-
-    var wert = object.value;
-    wurf_nr = wurf_nr + 1; 
-    überworfen = false;
-    if(triple){
-        wert = wert * 3;
-    }else{
-        if(double){
-            wert = wert * 2;
-        }
-    }
-
-    if(spieler){
-      currentPunktstand = document.getElementById('punkteSpieler1').value
-      currentSpieler = "Spieler1";
-      andererSpieler = "Spieler2";
-
-
-    }else{
-      currentPunktstand = document.getElementById('punkteSpieler2').value
-      currentSpieler = "Spieler2";
-      andererSpieler = "Spieler1";
-    }
-    if(checkWinning(wert,double,currentPunktstand)){
-        document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "green";
-        var winningText = currentSpieler + " gewinnt!";
-        alert(winningText);
-    }else{
-      if(currentPunktstand - wert < 2){
-                    überworfen = true;
-                    socket.emit('ueberworfen', {data: wert, currentSpieler: currentSpieler});
-      }else{
-          socket.emit('wurf', {data: wert, currentSpieler: currentSpieler});
-      }
-      winner = false;
-    }
-    if(wurf_nr == 3 || überworfen){
-      //spieler = !spieler;
-      wurf_nr = 0;
-      //document.getElementsByClassName(andererSpieler)[0].style.backgroundColor = "#bfe0c4";
-      //document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "#ecedef";
-    }else{
-      //document.getElementsByClassName(currentSpieler)[0].style.backgroundColor = "#bfe0c4";
-      //document.getElementsByClassName(andererSpieler)[0].style.backgroundColor = "#ecedef";
-    }
-    document.getElementById('PunktEingabeFrei').value = "";
-    triple = false;
-    double = false;
-    document.getElementById("bull").style.backgroundColor = "#ecedef";
-    ColorsTripleDouble();
-    //document.getElementById('sound1').play();
-  }
-  function noscore(){
-    for(var i = (wurf_nr + 1); i < 4; i++){
-      sendWurf(document.getElementById('zero'))
-    }
-  }
-
-  function sendBroadcast(){
-    //SPIEL STARTEN
-    if (confirm("Spiel starten?") == true) {
-        //text = "You pressed OK!";
-      
-      counter++;
-      socket.emit('init event', {data: counter});
-      document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
-      document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#ecedef";
-      document.getElementById('PunktEingabeFrei').value = "";
-      for(var i = 1; i < 4; i++){
-              wurf_id = "wurf1" + i;
-              wurf_id2 = "wurf2" + i;
-              document.getElementById(wurf_id).value = "";
-              document.getElementById(wurf_id2).value = "";
-      }
-      document.getElementById("avgSpieler1").value = "";
-      document.getElementById("avgSpieler2").value = "";
-      document.getElementById("double").style.backgroundColor = "#ecedef";
-      document.getElementById("triple").style.backgroundColor = "#ecedef";
-      document.getElementById("bull").disabled = false;
-      document.getElementById("bull").style.backgroundColor = "#ecedef";
-    } else {
-      //text = "You canceled!";
-    }
-
-  }
-  function setColor(object){
-    console.log("touch event");
-    object.style.backgroundColor = "#3a2222";
-    object.style.color = "red";
-    //document.getElementById("bull").style.backgroundColor = "red";
-  }
-  function releaseColor(object){
-    console.log("touch event released");
-    object.style.backgroundColor = "#ecedef";
-    object.style.color = "#235558";
-    //document.getElementById("bull").style.backgroundColor = "red";
-  }
-
-  </script>
-
-
-
+  <script type="text/javascript" src="/static/script.js"> </script>
 
 <body>
-  <!--<h1>X501-Match</h1> -->
-  <div style="display: none;">
-      Spieler an der Reihe (true, false) == (Spieler1, Spieler2) <input type="text" readonly id="debugSpieler"><br>
-      Anzahl der gespielten Würfe in dieser Aufnahme <input type="text" readonly id="debugWurfNr"><br><input class="punktstand" type="text" readonly id="debug">
-  </div>
-  <audio id="sound1" src="/static/26.wav" preload="auto"></audio>
-  <div id="center">
-    <table id="calcu" width="100%" style="background-color: dimgrey;">
-      <tr>
-        <td colspan="1"><input class="buttonNormal" value="Spiel Starten" type="button" onclick="sendBroadcast()"></td>
-        <td colspan="1"><input class="buttonNormal" type="button" value="Korrektur S1" onclick="sendekorrektur(document.getElementById('PunktEingabeFrei'),'Spieler1')"></td>
-        <td colspan="1"><input class="normalButton" style="width: 95%; background: white;color: black;"type="number" min="0" max="501" step="1" id="PunktEingabeFrei"></td>
-        <td colspan="1"><input class="buttonNormal" type="button" value="Korrektur S2" onclick="sendekorrektur(document.getElementById('PunktEingabeFrei'),'Spieler2')"></td>
-        <td colspan="1"><input class="buttonNormal" type="button" value="Spielerwechsel" onclick="fordereSpielerwechsel()"></td>
-      </tr>
-    </table>
-  </div>
-  <div class="Spieler1 spieler">
-      <h2>Spieler 1</h2>
-      Punktestand:
-      <input class="punktstand" type="text" readonly id="punkteSpieler1"> Avg.: <input class="wurf" type="text" readonly id="avgSpieler1"><br>
-      1:<input class="wurf" type="text" readonly id="wurf11">
-      2:<input class="wurf" type="text" readonly id="wurf12">
-      3:<input class="wurf" type="text" readonly id="wurf13">
-  </div>
-  <div class="Spieler2 spieler">
-    <h2>Spieler 2</h2>
-      Punktestand:
-      <input class="punktstand" type="text" readonly id="punkteSpieler2"> Avg.: <input class="wurf" type="text" readonly id="avgSpieler2"><br>
-      1:<input class="wurf" type="text" readonly id="wurf21">
-      2:<input class="wurf" type="text" readonly id="wurf22">
-      3:<input class="wurf" type="text" readonly id="wurf23">
-  </div>
-  <div id="center">
+        <!-- Trigger/Open The Modal -->
+    <button id="myBtn" class="buttonValues menu" onclick="openModal()">ALBS Dart Menü</button>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <input type="button" value = "Spiel starten" class="buttonValues"onclick="sendBroadcast()">
+        <input type="button" value = "Vollbild Video" class="buttonValues"onclick="location.href='/fullscreen'"><br>
+        <input type="button" value = "Letzten Wurf rückgängig" class="buttonValues" onclick="sendZurueck()"><br>
+        <img src="http://192.168.0.213:8100/video_feed_1" width="50%">
+    </div>
+    </div>  
     <!--
-    <table width="100%">
-      <tr>
-        <td style="background: grey;">
-          <input class="normalButton" style="width: 20%; background: white;color: black;  "type="text" id="PunktEingabeFrei">
-          <input class="normalButton" style="width:40%;" type="button" value="Eingabe" onclick="sendWurf(document.getElementById('PunktEingabeFrei'))">
-        </td>
-        <td><input class="normalButton" type="button" value="NoScore" onclick="noscore()"></td>
-      </tr>
-    </table>   --> 
-      <table id="calcu" width="100%">
-          <tr>
-              <td width="14%"><input type="button" class="buttonValues" value="1" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="2" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="3" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="4" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="5" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="6" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="7" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+    <div id="winner" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h1>Winner</h1>
+        <input class="punktstand" type="text" readonly id="Winner">
+        Avg: <input class="wurf inputbox" type="text" readonly id="WinnerAvg"><br>
+        Darts: <input class="wurf inputbox" type="text" readonly id="winnerDarts"> <br>
 
-          </tr>
-          <tr>
-              <td width="14%"><input type="button" class="buttonValues" value="8" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="9" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="10" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="11" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="12" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="13" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td width="14%"><input type="button" class="buttonValues" value="14" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-          </tr>
-          <tr>
-              <td><input type="button" class="buttonValues" value="15" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td><input type="button" class="buttonValues" value="16" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td><input type="button" class="buttonValues" value="17" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td><input type="button" class="buttonValues" value="18" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td><input type="button" class="buttonValues" value="19" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td><input type="button" class="buttonValues" value="20" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td><input type="button" class="buttonValues" value="25" onclick="sendWurf(this)" id="bull"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-          </tr>
-          <tr>
-              <td colspan="3"><input type="button" class="buttonValues" value="0" id="zero" onclick="sendWurf(this)"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td colspan="2"><input type="button" class="buttonValues" value="Double" onclick="toggleDouble()" id="double"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <td colspan="2"><input type="button" class="buttonValues" value="Triple" onclick="toggleTriple()" id="triple"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
-              <!--<td colspan="2"><input type="button" class="buttonValues" value="Zurück" disabled="true" onclick="sendZurueck()"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>-->
-          </tr>
-      </table>
-  </div>
+    </div>
+    </div>
+-->
+    <div id="spieler" class="spieler Spieler1">
+        <table id="calcu" width="100%">
+            <tr>
+                <td colspan="3" width="75%">Spieler1</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3" width="75%"><input class="punktstand" type="text" readonly id="punkteSpieler1"></td>
+                <td class="wurf"  width="25%">
+                    Darts: <input class="wurf inputbox" type="text" readonly id="dartscount1"> <br>
+                
+                    Avg: <input class="wurf inputbox" type="text" readonly id="avgSpieler1"><br>
+                    Aufn.: <input class="wurf inputbox" type="text" readonly id="visitscoreSpieler1">
+                </td>
+            </tr>                
 
- <!-- <div id="center">
-    <input type="button" class="buttonValues" value="Spielerwechsel" onclick=""  ontouchstart="setColor(this)" ontouchend="releaseColor(this)">
-    <input type="button" class="buttonValues" value="Korrektur" onclick=""  ontouchstart="setColor(this)" ontouchend="releaseColor(this)">
-   </div>-->
+            <tr>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf11"></td>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf12"></td>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf13"></td>
+                <td></td>
+            </tr>
+        </table>    
+    </div>
+    <div id="spieler" class="spieler Spieler2">
+        <table id="calcu" width="100%">
+            <tr>
+                <td colspan="3" width="75%">Spieler2</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3" width="75%"><input class="punktstand" type="text" readonly id="punkteSpieler2"></td>
+                <td class="wurf" width="25%">
+                    Darts: <input class="wurf inputbox" type="text" readonly id="dartscount2"> <br>
+                
+                    Avg: <input class="wurf inputbox" type="text" readonly id="avgSpieler2"><br>
+                    Aufn.: <input class="wurf inputbox" type="text" readonly id="visitscoreSpieler2">
+                </td>
+            </tr>                
+
+            <tr>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf21"></td>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf22"></td>
+                <td class="wurf"><input class="wurf inputbox" type="text" readonly id="wurf23"></td>
+                <td></td>
+            </tr>
+        </table>    
+    </div>
+
+    <div id="center">
+          <table id="calcu" width="100%">
+              <tr>
+                  <td><input type="button" class="buttonValues" value="1" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="2" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="3" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="4" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="5" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="6" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="7" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+    
+              </tr>
+              <tr>
+                  <td><input type="button" class="buttonValues" value="8" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="9" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="10" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="11" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="12" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="13" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="14" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+              </tr>
+              <tr>
+                  <td><input type="button" class="buttonValues" value="15" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="16" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="17" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="18" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="19" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="20" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td><input type="button" class="buttonValues" value="25" onclick="sendWurf(this)" id="bull"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+              </tr>
+              <tr>
+                  <td colspan="3"><input type="button" class="buttonValues" value="0" id="zero" onclick="sendWurf(this)"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td colspan="2"><input type="button" class="buttonValues" value="Double" onclick="toggleDouble()" id="double"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td colspan="2"><input type="button" class="buttonValues" value="Triple" onclick="toggleTriple()" id="triple"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <!--<td colspan="2"><input type="button" class="buttonValues" value="Zurück" disabled="true" onclick="sendZurueck()"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>-->
+              </tr>
+          </table>
+      </div>
+    
 </body>
-  </body>
 </html>
