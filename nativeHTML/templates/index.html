@@ -18,8 +18,9 @@
     <!-- Modal content -->
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
-        <button onclick="sendBroadcast()">Spiel starten</button>
-        <button onclick="location.href='/fullscreen'">Vollbild Video</button><br>
+        <input type="button" value = "Spiel starten" class="buttonValues"onclick="sendBroadcast()">
+        <input type="button" value = "Vollbild Video" class="buttonValues"onclick="location.href='/fullscreen'"><br>
+        <input type="button" value = "Letzten Wurf rückgängig" class="buttonValues" onclick="sendZurueck()"><br>
         <img src="http://192.168.0.213:8100/video_feed_1" width="50%">
     </div>
     </div>  
