@@ -36,8 +36,12 @@ var socket = io();
       //  modal.style.display = "none";
       // }
     }
+    socket.on('init_names', function(msg) {
+      //$('#textBox').append('<p>Received: ' + msg.data + '</p>');
+      document.getElementById('name1').value = msg.spieler1;
+      document.getElementById('name2').value = msg.spieler2;
 
-
+    });
     socket.on('spielstand_update', function(msg) {
       //$('#textBox').append('<p>Received: ' + msg.data + '</p>');
       document.getElementById('punkteSpieler1').value = msg.punktstand1;

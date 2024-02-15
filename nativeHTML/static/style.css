@@ -13,8 +13,12 @@
     cursor: pointer;    
   }
   .menu{
-    height: 40px;
-
+    width: 100%;
+    background: #ecedef;  
+    border: none;  
+    font-size: 24px;  
+    color: #235558;  
+    cursor: pointer;    
   }
 
   .wurf{
@@ -28,6 +32,9 @@
   .inputbox{
     max-width: 80px;
     width: 50%;
+  }
+  .names{
+    background: transparent;
   }
 
   .punktstand{
@@ -72,7 +79,10 @@
     }
     .wurf{
       font-size: 16px;  
-      font-weight: 150;
+      font-weight: 600;
+    }
+    .buttonValues{
+      height: 90px;
     }
 
   }
