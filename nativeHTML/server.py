@@ -481,13 +481,20 @@ def initGame():
 
     time = str(datetime.datetime.now())
 
+    name1 = "Lini"
+    name2 = "Rici"
+
     query = "INSERT INTO dartgame_header ('Game_ID','Typ','Typ_Punktstand','Spieler1_ID','Spieler2_ID','Spieler1_Name','Spieler2_Name','Ergebnis','Startzeit')"
-    query = query +  "VALUES ("+ str(game_id) + ",'DoubleOut',501,1,2,'Lini','Rici','läuft','" + time + "')"
+    query = query +  "VALUES ("+ str(game_id) + ",'DoubleOut',501,1,2,'" + str(name1) + "','" + str(name2) + "','läuft','" + time + "')"
 
     winner = None
     cursor.execute(query)
 
     connection.commit()
+
+    emit('init_names', {'spieler1': name1,'spieler2': name2}, broadcast=True)
+
+
     emit('spielstand_update', {'punktstand1': 501,'punktstand2': 501}, broadcast=True)
     connection.close()
 
