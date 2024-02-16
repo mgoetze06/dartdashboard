@@ -14,11 +14,8 @@
   }
   .menu{
     width: 100%;
-    background: #ecedef;  
+    height: 48px;
     border: none;  
-    font-size: 24px;  
-    color: #235558;  
-    cursor: pointer;    
   }
 
   .wurf{
@@ -28,6 +25,22 @@
     font-size: 24px;  
     font-weight: 200;
   }
+
+  a.icon {
+    background: white;
+    display: block;
+    position: fixed;
+    right: 0;
+    top: 0;
+  }
+  a {
+    color: black;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    display: block;
+  }
+
 
   .inputbox{
     max-width: 80px;
@@ -119,7 +132,7 @@
 
 /* Modal Content */
 .modal-content {
-  background-color: #fefefe;
+  background-color: #ecedef;
   margin: auto;
   padding: 20px;
   border: 1px solid #888;
@@ -128,10 +141,13 @@
 
 /* The Close Button */
 .close {
-  color: #aaaaaa;
+  color: #4b3737;
+  width: 48px;
+  height: 48px;
   float: right;
-  font-size: 48;
-  font-weight: bold;
+  font-size: 92;
+  font-weight: 1200;
+  text-align: center;
 }
 
 .close:hover,

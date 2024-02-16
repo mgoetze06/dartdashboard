@@ -4,20 +4,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>albs-dart</title>
     <link rel="stylesheet" type="text/css" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
   </head>
   <script type="text/javascript" src="/static/script.js"> </script>
 
 <body>
-        <!-- Trigger/Open The Modal -->
-    <button id="myBtn" class="menu" onclick="openModalMenu()">ALBS Dart Menü</button>
+        <!-- Trigger/Open The Modal 
+    <button id="myBtn" class="menu" onclick="openModalMenu()">ALBS Dart Menü</button>-->
+    <div class="menu">
+        <a href="javascript:void(0);" class="icon" onclick="openModalMenu()">
+            <i class="fa fa-bars"></i>
+          </a>
+
+    </div>
+
 
     <!-- The Modal -->
     <div id="myModal" class="modal">
 
     <!-- Modal content -->
     <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
+        <!-- <span class="close" onclick="closeModal()">&times;</span> -->
         <input type="button" value = "Spiel starten" class="buttonValues"onclick="sendBroadcast()">
         <input type="button" value = "Vollbild Video" class="buttonValues"onclick="location.href='/fullscreen'"><br>
         <input type="button" value = "Letzten Wurf rückgängig" class="buttonValues" onclick="sendZurueck()"><br>
@@ -115,9 +123,10 @@
                   <td><input type="button" class="buttonValues" value="25" onclick="sendWurf(this)" id="bull"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
               </tr>
               <tr>
-                  <td colspan="3"><input type="button" class="buttonValues" value="0" id="zero" onclick="sendWurf(this)"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td colspan="1"><input type="button" class="buttonValues" value="0" id="zero" onclick="sendWurf(this)"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
                   <td colspan="2"><input type="button" class="buttonValues" value="Double" onclick="toggleDouble()" id="double"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
                   <td colspan="2"><input type="button" class="buttonValues" value="Triple" onclick="toggleTriple()" id="triple"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
+                  <td colspan="2"><input type="button" class="buttonValues" value="Zurück" onclick="sendZurueck()" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>
                   <!--<td colspan="2"><input type="button" class="buttonValues" value="Zurück" disabled="true" onclick="sendZurueck()"  ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>-->
               </tr>
           </table>
