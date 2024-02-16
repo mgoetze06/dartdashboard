@@ -9,18 +9,27 @@ var socket = io();
     
 
     // When the user clicks the button, open the modal 
-    function openModal() {
+    function openModalMenu() {
         var modal = document.getElementById("myModal");
         modal.style.display = "block";
 
     }
-    
+      // When the user clicks the button, open the modal 
+    function openModalWinner() {
+        var modal = document.getElementById("winner");
+        modal.style.display = "block";
+
+    }
+  
     // When the user clicks on <span> (x), close the modal
     function closeModal() {
         var modal = document.getElementById("myModal");
         modal.style.display = "none";
-        //var modal = document.getElementById("winnerModal");
-        //modal.style.display = "none";
+        modal = document.getElementById("winner");
+        if (modal != null){
+          modal.style.display = "none";
+
+        }
     }
     
     // When the user clicks anywhere outside of the modal, close it
@@ -60,12 +69,14 @@ var socket = io();
       //var modal = document.getElementById("winnerModal");
       //modal.style.display = "block";
 
-      //document.getElementById('Winner').value = msg.winner;
-      //document.getElementById('WinnerAvg').value = msg.avg;
-      //document.getElementById('WinnerDarts').value = msg.darts;
+      document.getElementById('Winner').value = msg.name;
+      document.getElementById('WinnerAvg').value = msg.avg;
+      document.getElementById('WinnerDarts').value = msg.darts;
 
       var id = "Spieler" + msg.winner;
       document.getElementsByClassName(id)[0].style.backgroundColor = "green";
+      openModalWinner();
+
 
     });
 
@@ -119,7 +130,7 @@ var socket = io();
 
     function sendZurueck(){
       socket.emit('zurueck');
-
+      closeModal();
     }
 
   function sendekorrektur(object,spielerkorrektur){

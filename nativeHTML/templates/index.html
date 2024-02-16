@@ -10,7 +10,7 @@
 
 <body>
         <!-- Trigger/Open The Modal -->
-    <button id="myBtn" class="menu" onclick="openModal()">ALBS Dart Menü</button>
+    <button id="myBtn" class="menu" onclick="openModalMenu()">ALBS Dart Menü</button>
 
     <!-- The Modal -->
     <div id="myModal" class="modal">
@@ -21,21 +21,20 @@
         <input type="button" value = "Spiel starten" class="buttonValues"onclick="sendBroadcast()">
         <input type="button" value = "Vollbild Video" class="buttonValues"onclick="location.href='/fullscreen'"><br>
         <input type="button" value = "Letzten Wurf rückgängig" class="buttonValues" onclick="sendZurueck()"><br>
-        <img src="http://192.168.0.213:8100/video_feed_1" width="50%">
+        <!--<img src="http://192.168.0.213:8100/video_feed_1" width="50%">-->
     </div>
     </div>  
-    <!--
     <div id="winner" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
         <h1>Winner</h1>
         <input class="punktstand" type="text" readonly id="Winner">
         Avg: <input class="wurf inputbox" type="text" readonly id="WinnerAvg"><br>
-        Darts: <input class="wurf inputbox" type="text" readonly id="winnerDarts"> <br>
+        Darts: <input class="wurf inputbox" type="text" readonly id="WinnerDarts"> <br>
 
     </div>
     </div>
--->
+
     <div id="spieler" class="spieler Spieler1">
         <table id="calcu" width="100%">
             <tr>
