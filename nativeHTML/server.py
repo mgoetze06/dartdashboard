@@ -131,8 +131,8 @@ def sendeAufnahmeZuEinzelnenWürfen(aufnahme,id):
     cursor.execute(query)
     rows = cursor.fetchall()
     #print(rows)
-
-    
+    for i in range(len(rows),3):
+        emit('wurf_historie',{'wurfnummer': str(i+1), 'wert': '', 'spielerid': str(id)}, broadcast=True)
 
 
     for i in range(len(rows)):
@@ -142,8 +142,10 @@ def sendeAufnahmeZuEinzelnenWürfen(aufnahme,id):
         #else:
         emit('wurf_historie',{'wurfnummer': str(i+1), 'wert': str(rows[i][8]) + str(rows[i][1]), 'spielerid': str(id)}, broadcast=True)
     
-    emit('avg',{'avg': str(round(rows[-1][7],2)),'dartscount': str(rows[-1][0]), 'spielerid': str(id)}, broadcast=True)
-    emit('visit_score',{'visit_score': str(rows[-1][6])}, broadcast=True)
+
+    if len(rows)>0:
+        emit('avg',{'avg': str(round(rows[-1][7],2)),'dartscount': str(rows[-1][0]), 'spielerid': str(id)}, broadcast=True)
+        emit('visit_score',{'visit_score': str(rows[-1][6])}, broadcast=True)
 
 def schreibeGewinner(id):
     global database_path
@@ -166,7 +168,13 @@ def schreibeGewinner(id):
         else:
             avg = avg2
             darts = p2.wurf_Nummer
-        emit('winner',{'winner': str(id),'avg': str(avg), 'darts': str(darts)}, broadcast=True)
+
+        queryString = "Spieler" + str(id) + "_Name"
+
+        query = "select "+queryString + " from dartgame_header where Game_ID = " + str(game_id)
+        cursor.execute(query)
+        rows = cursor.fetchone()
+        emit('winner',{'winner': str(id),'avg': str(avg), 'darts': str(darts), 'name': str(rows[0])}, broadcast=True)
 
 
 def SchreibeGesamteAufnahmeAlsFehler(aufnahme,id):
@@ -389,6 +397,11 @@ def InsertWurf(neuerWurf_Wert=0, neuerWurf_Typ='S'):
 #     connection.commit()
 
 
+def clearWurfAnzeige(id):
+    for i in range(3):
+        emit('wurf_historie',{'wurfnummer': str(i+1), 'wert': '', 'spielerid': str(id)}, broadcast=True)
+
+
 
 def SendSpielstandToESP(data):
     global url,headers
@@ -451,11 +464,41 @@ def handle_zurueck():
 
     connection = sqlite3.connect(database_path)
     cursor = connection.cursor()
+
+    #rest berechnen, bevor eine zeile gelöscht wird
+    query = "select Wurf_Nummer, Spieler_ID from dartgame_details where Game_ID = " + str(game_id) + " and Wurf_Nummer_Gesamt = (select MAX(Wurf_Nummer_Gesamt) from dartgame_details where Game_ID = " + str(game_id) + ")"
+    cursor.execute(query)
+    rows = cursor.fetchone()
+    rest = rows[0] % 3
+    id  = rows[1]
+    if rest == 1:
+        clearWurfAnzeige(id)
+    if rest == 0:
+        
+        #id  = ErmittleAndereID(id)
+        
+        if id == 1:
+            emit('spieler_wechsel', {'spieler': 'Spieler1'}, broadcast=True)
+        else:
+            emit('spieler_wechsel', {'spieler': 'Spieler2'}, broadcast=True)
     query = "delete from dartgame_details where Game_ID = " + str(game_id) + " and Wurf_Nummer_Gesamt = (select MAX(Wurf_Nummer_Gesamt) from dartgame_details where Game_ID = " + str(game_id) + ")"
     cursor.execute(query)
     connection.commit()
 
-    UpdateSpielstand()
+    query = "select Aufnahme, Spieler_ID, Wurf_Nummer from dartgame_details where Game_ID = " + str(game_id) + " and Wurf_Nummer_Gesamt = (select MAX(Wurf_Nummer_Gesamt) from dartgame_details where Game_ID = " + str(game_id) + ")"
+    cursor.execute(query)
+    rows = cursor.fetchone()
+    if rows == None:
+        initGame()
+    else:
+        aufnahme = rows[0]
+        id = rows[1]
+        sendeAufnahmeZuEinzelnenWürfen(aufnahme,id)
+        UpdateSpielstand()
+    
+
+
+
 @socketio.on('init event')
 def test_message(message):
     initGame()
@@ -492,6 +535,7 @@ def initGame():
 
     emit('init_names', {'spieler1': name1,'spieler2': name2}, broadcast=True)
 
+    sendeAufnahmeZuEinzelnenWürfen(0,0)
 
     emit('spielstand_update', {'punktstand1': 501,'punktstand2': 501}, broadcast=True)
     connection.close()
