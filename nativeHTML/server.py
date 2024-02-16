@@ -12,7 +12,7 @@ headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
 debug = False
 
-ESPAvailable = False
+ESPAvailable = True
 
 spieler = "Spieler1"
 
@@ -410,13 +410,11 @@ def UpdateSpielstand():
     emit('spielstand_update', {'punktstand1': str(p1.punktstand),'punktstand2': str(p2.punktstand)}, broadcast=True)
 
 
-    spieler = "Spieler1"
-    #send spielstand to esp displays
-    if spieler == "Spieler1":
+
+    if p1.wurf_Nummer_Gesamt > p2.wurf_Nummer_Gesamt:
         spielerindex = '0'
-    else: 
-        if spieler == "Spieler2":
-            spielerindex = '1'
+    else:
+         spielerindex = '1'
     data = {'punkte0': str(p1.punktstand), 'punkte1': str(p2.punktstand), 'spieler': spielerindex}
     SendSpielstandToESP(data)
 
@@ -501,6 +499,12 @@ def initGame():
     if ESPAvailable:
         global url,headers
         data = {'punkte0': '501', 'punkte1': '501', 'spieler': '0'}
+        try:
+            requests.post(url, data=json.dumps(data), headers=headers,timeout=0.5)
+        except requests.Timeout:
+            pass
+    
+        data = {'punkte0': '501', 'punkte1': '501', 'spieler': '1'}
         try:
             requests.post(url, data=json.dumps(data), headers=headers,timeout=0.5)
         except requests.Timeout:
