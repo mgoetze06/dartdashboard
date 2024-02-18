@@ -1,6 +1,7 @@
 import cv2
 from flask import Flask, render_template, Response
-import time
+import time, datetime
+import os
 
 camera = cv2.VideoCapture("/dev/video14")
 #camera = cv2.VideoCapture(0,cv2.CAP_DSHOW)
@@ -22,15 +23,31 @@ def gen_frames():
         try:
             success, frame = camera.read()  # read the camera frame
             if not success:
-                break
+                #print("camera not available")
+                path = os.path.join(os.getcwd(),"noconnection.jpg")
+                #print(path)
+                frame = cv2.imread(path)
+                #frame = cv2.GaussianBlur(frame,(25,25),3)
+                frame = cv2.blur(frame, (100, 100))
+                cv2.putText(frame,"Keine Verbindung zur Kamera!",(100,200),cv2.FONT_HERSHEY_PLAIN,15,(0,0,0),3)
+                localtime = datetime.datetime.now()
+                cv2.putText(frame,str(localtime),(100,450),cv2.FONT_HERSHEY_PLAIN,10,(0,0,0),3)
+
+
+
+
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
+            
+            if success:
+                time.sleep(0.04)
             else:
-                ret, buffer = cv2.imencode('.jpg', frame)
-                frame = buffer.tobytes()
-                yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
-            time.sleep(0.04)
+                time.sleep(5)
         except:
-            time.sleep(0.08)
+            print("broke: camera not available")
+            time.sleep(2)
 
 @app.route('/video_feed_1')
 def video_feed_1():
