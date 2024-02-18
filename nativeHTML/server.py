@@ -440,7 +440,8 @@ def index():
 @app.route('/fullscreen')
 def fullscreen():
     """Video streaming home page."""
-    return render_template('fullscreen.html')
+    return render_template('videos.html')
+
 
 @socketio.on('message')
 def handle_message(data):
