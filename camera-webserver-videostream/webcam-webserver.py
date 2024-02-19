@@ -78,10 +78,10 @@ def gen_frames():
             #print(image.size)
             #print(image_io)
             image_io.seek(0)
-            org_img = cv2.imdecode(np.frombuffer(image_io.read(), np.uint8), 1)
+            #org_img = cv2.imdecode(np.frombuffer(image_io.read(), np.uint8), 1)
             #scr_w,scr_h = 1920,1080
-            if org_img.shape[1] > 1920:
-                org_img = imutils.resize(org_img, width=1920)
+            #if org_img.shape[1] > 1920:
+            #    org_img = imutils.resize(org_img, width=1920)
 
             #if not success:
             #    #print("camera not available")
@@ -97,18 +97,19 @@ def gen_frames():
 
 
 
-            ret, buffer = cv2.imencode('.jpg', org_img)
-            frame = buffer.tobytes()
+            #ret, buffer = cv2.imencode('.jpg', org_img)
+            #frame = buffer.tobytes()
+            frame = image_io.read()
             yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  # concat frame one by one and show result
             
-            if success:
-                time.sleep(0.04)
-            else:
-                time.sleep(5)
+            #if success:
+            #    time.sleep(0.04)
+            #else:
+            #    time.sleep(5)
         except:
             print("broke: camera not available")
-            time.sleep(2)
+            #time.sleep(2)
 
 @app.route('/video_feed_1')
 def video_feed_1():
