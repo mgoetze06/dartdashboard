@@ -6,19 +6,37 @@
     <title>Live Stream 1</title>
 
     <script type="text/javascript" src="/static/script.js" defer> </script>
-    
+    <style>
+        #first {
+            /*display: inline-block;*/
+            width:10%;
+            float: left;
+        }
+        #second {
+            /*display: inline-block;*/
+            width: 90%;
+            
+            float: right;
+        }
+    </style>
 </head>
 <body>
-<div class="slidecontainer">
+<div id="wrapper">
+<div class="slidecontainer" id="first">
     <form method="POST" action="test">
-        <input type="range" min="1" max="5000" value="50" class="slider" id="slider1" onchange="sendValue(this.id)">
+        Untere Grenze:<br>
+        <input type="range" min="1" max="7000" value="3000" class="slider" id="slider1" onchange="sendValue(this.id)"><br>
+        Obere Grenze:<br>
+        <input type="range" min="1" max="7000" value="10000" class="slider" id="slider2" onchange="sendValue(this.id)"><br>
     </form>
+
+    Konsole:<br>
     <p id="console"></p>
 </div>
-<div width="100%" class="imgbox">
+<div width="100%" class="imgbox" id="second"> 
 
     <img src="{{ url_for('video_feed_1') }}" width="100%" id="stream1" onclick="getClickPosition(this.id)">
 </div>
-
+</div>
 </body>
 </html>

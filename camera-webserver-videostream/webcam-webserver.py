@@ -69,6 +69,10 @@ backSub = cv2.createBackgroundSubtractorKNN(20)
 max_frame_ignore_counter = 10
 frame_ignore_counter = nonzero_frames = 0
 dart_found = False
+slider1 = 2000
+slider2 = 7000
+
+setupPoints = []
 
 def computeDartToPosition(image_opened):
     ocv = thin(image_opened)
@@ -115,7 +119,7 @@ def computeDartToPosition(image_opened):
     return (round(max_x),round(max_y))
 
 def gen_frames():
-    global max_frame_ignore_counter,frame_ignore_counter,dart_found,nonzero_frames
+    global max_frame_ignore_counter,frame_ignore_counter,dart_found,nonzero_frames,slider2,slider1,setupPoints
     while True:
         try:
 
@@ -196,16 +200,20 @@ def gen_frames():
             frame = cv2.imread(path)
             frame = cv2.GaussianBlur(frame,(25,25),3)
             frame = cv2.blur(frame, (100, 100))
-            cv2.putText(frame,"Keine Verbindung zur Kamera!",(100,200),cv2.FONT_HERSHEY_PLAIN,15,(0,0,0),3)
+            cv2.putText(frame,"Keine Verbindung zur Kamera!",(100,200),cv2.FONT_HERSHEY_PLAIN,5,(0,0,0),3)
             localtime = datetime.datetime.now()
-            cv2.putText(frame,str(localtime),(100,450),cv2.FONT_HERSHEY_PLAIN,10,(0,0,0),3)
+            cv2.putText(frame,str(localtime),(100,300),cv2.FONT_HERSHEY_PLAIN,5,(0,0,0),3)
+            cv2.putText(frame,str(slider1),(100,400),cv2.FONT_HERSHEY_PLAIN,5,(0,0,0),3)
+            cv2.putText(frame,str(slider2),(100,500),cv2.FONT_HERSHEY_PLAIN,5,(0,0,0),3)
+            for point in setupPoints:
+                cv2.circle(frame,(point[0],point[1]),3,(255,0,0),10)
 
             ret, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
             #frame = image_io.read()
             yield (b'--frame\r\n'
                 b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-            time.sleep(2)
+            time.sleep(0.5)
 
 @app.route('/video_feed_1')
 def video_feed_1():
@@ -219,13 +227,27 @@ def index():
 
 @app.route('/send/<data>')
 def send_ir_command(data):
+    global slider1,slider2
     print("Recieved: ", data)
+    if "slider" in data:
+        split = data.split("-")
+        inputname = split[0]
+        inputvalue = split[1]
+        print(inputname,inputvalue)
 
-    split = data.split("-")
-    inputname = split[0]
-    inputvalue = split[1]
+        if inputname == "slider1":
+            slider1 = inputvalue
+        else:
+            if inputname == "slider2":
+                slider2 = inputvalue
+    else:
+        print("point recieved: ", data)
 
-    print(inputname,inputvalue)
+        split = data.split("-")
+        x = split[0].split("x")[1]
+        y = split[1].split("y")[1]  
+
+        setupPoints.append((int(x),int(y)))
 
     return "{} - OK".format(data)
 
