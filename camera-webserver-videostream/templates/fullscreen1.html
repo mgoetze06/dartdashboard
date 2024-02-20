@@ -4,11 +4,20 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <title>Live Stream 1</title>
+
+    <script type="text/javascript" src="/static/script.js" defer> </script>
+    
 </head>
 <body>
+<div class="slidecontainer">
+    <form method="POST" action="test">
+        <input type="range" min="1" max="5000" value="50" class="slider" id="slider1" onchange="sendValue(this.id)">
+    </form>
+    <p id="console"></p>
+</div>
+<div width="100%" class="imgbox">
 
-<div width="100%">
-    <img src="{{ url_for('video_feed_1') }}" width="100%" onclick="location.href='/'">
+    <img src="{{ url_for('video_feed_1') }}" width="100%" id="stream1" onclick="getClickPosition(this.id)">
 </div>
 
 </body>
