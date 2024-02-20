@@ -33,6 +33,7 @@ function sendValue(valueID) {
     xhttp.send();
     setTimeout(function () { button.style.opacity = 1; button.disabled = false; }, 150);
 };
+
 function getClickPosition(e) {
     var img = document.getElementById(e);
     var currentClickPosX = mouseX - img.offsetLeft;
@@ -50,4 +51,17 @@ function getClickPosition(e) {
 
     console.log("Current X: " + currentClickPosX + " Current Y: " + currentClickPosY +
         "\r\nNatural X: " + naturalClickPosX + " Natural Y: " + naturalClickPosY);
+
+
+    var xhttp = new XMLHttpRequest();
+
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            document.getElementById("console").innerHTML = this.responseText;
+        }
+    };
+    var urlCommand = window.location.href + "send/x" + naturalClickPosX + "-y" + naturalClickPosY;
+    console.log(urlCommand);
+    xhttp.open("GET", urlCommand, true);
+    xhttp.send();
 };
