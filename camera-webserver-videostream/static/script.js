@@ -31,6 +31,11 @@ function sendValue(valueID) {
     button.disabled = true;
     xhttp.open("GET", urlCommand, true);
     xhttp.send();
+
+    var valueSliderTextID = "value" + valueID;
+    document.getElementById(valueSliderTextID).innerHTML = valueSlider;
+
+
     setTimeout(function () { button.style.opacity = 1; button.disabled = false; }, 150);
 };
 

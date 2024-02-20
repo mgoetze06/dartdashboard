@@ -18,16 +18,23 @@
             
             float: right;
         }
+        .slider{
+            width: 90%;
+        }
+        .slidervalue{
+            width: 30%;
+            display: inline;
+        }
     </style>
 </head>
 <body>
 <div id="wrapper">
 <div class="slidecontainer" id="first">
     <form method="POST" action="test">
-        Untere Grenze:<br>
-        <input type="range" min="1" max="7000" value="3000" class="slider" id="slider1" onchange="sendValue(this.id)"><br>
-        Obere Grenze:<br>
-        <input type="range" min="1" max="7000" value="10000" class="slider" id="slider2" onchange="sendValue(this.id)"><br>
+        Untere Grenze: <p class="slidervalue" id="valueslider1"></p><br>
+        <input type="range" min="1" max="7000" class="slider" id="slider1" onchange="sendValue(this.id)"><br>
+        Obere Grenze: <p class="slidervalue" id="valueslider2"></p><br>
+        <input type="range" min="1" max="7000" class="slider" id="slider2" onchange="sendValue(this.id)"><br>
     </form>
 
     Konsole:<br>
