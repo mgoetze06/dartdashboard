@@ -27,8 +27,8 @@ function sendValue(valueID) {
     var urlCommand = window.location.href + "send/" + valueID + "-" + valueSlider;
     console.log(urlCommand);
     //var buttonName = document.getElementById("button" + buttonId);
-    button.style.opacity = 0.5;
-    button.disabled = true;
+    //button.style.opacity = 0.5;
+    //button.disabled = true;
     xhttp.open("GET", urlCommand, true);
     xhttp.send();
 
@@ -36,7 +36,7 @@ function sendValue(valueID) {
     document.getElementById(valueSliderTextID).innerHTML = valueSlider;
 
 
-    setTimeout(function () { button.style.opacity = 1; button.disabled = false; }, 150);
+    //setTimeout(function () { button.style.opacity = 1; button.disabled = false; }, 150);
 };
 
 function getClickPosition(e) {
