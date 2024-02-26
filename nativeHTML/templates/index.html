@@ -27,7 +27,7 @@
     <div class="modal-content">
         <!-- <span class="close" onclick="closeModal()">&times;</span> -->
         <input type="button" value = "Spiel starten" class="buttonValues"onclick="sendBroadcast()">
-        <input type="button" value = "Kamerastreams" class="buttonValues"onclick="location.href='/fullscreen'"><br>
+        <input type="button" value = "Kamerastreams" class="buttonValues"onclick="location.href='/streams'"><br>
         <input type="button" value = "Letzten Wurf rückgängig" class="buttonValues" onclick="sendZurueck()"><br>
         <!--<img src="http://192.168.0.213:8100/video_feed_1" width="50%">-->
     </div>
@@ -42,7 +42,7 @@
 
     </div>
     </div>
-
+    <div class="beideSpieler">
     <div id="spieler" class="spieler Spieler1">
         <table id="calcu" width="100%">
             <tr>
@@ -91,7 +91,17 @@
             </tr>
         </table>    
     </div>
-
+    </div>
+    <div class="beideSpieler">
+        <div id="stream">
+          <img src="http://192.168.0.101:8100/video_feed?computedart=True" alt='Server an http://192.168.0.101:8100 nicht gefunden.' id="streamimage" onclick="location.href='http://192.168.0.101:8100'">
+      
+        </div>
+        <div id="stream">
+          <img src="http://192.168.0.213:8100/video_feed_1" alt='Server an http://192.168.0.213:8100 nicht gefunden.' onclick="location.href='http://192.168.0.213:8100'">
+          <!--<button onclick="location.href='index.html'">Vollbild Video 2</button>-->
+        </div>
+      </div>
     <div id="center">
           <table id="calcu" width="100%">
               <tr>
@@ -131,6 +141,6 @@
               </tr>
           </table>
       </div>
-    
+
 </body>
 </html>

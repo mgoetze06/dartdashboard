@@ -74,7 +74,7 @@ slider1 = 700
 slider2 = 6400
 matrix = None
 setupPoints = []
-overlayParameters = noConnection = False
+overlayParameters = noConnection = computeDart = False
 
 def computeDartToPosition(image_opened):
     ocv = thin(image_opened)
@@ -187,19 +187,19 @@ def gen_frames():
                 if nonzero < (slider2+1000):
                     localtime = datetime.datetime.now()
                     #cv2.putText(org_img,str(localtime),(10,20),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
-                    cv2.putText(org_img,str(nonzero),(10,40),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
+                    #cv2.putText(org_img,str(nonzero),(10,40),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
                     redImg = np.zeros(org_img.shape, org_img.dtype)
                     redImg[:,:] = (0, 0, 255)
                     redMask = cv2.bitwise_and(redImg, redImg, mask=fgMask)
                     cv2.addWeighted(redMask, 1, org_img, 1, 0, org_img)
-
-                if nonzero > slider1 and nonzero < slider2:
-                    nonzero_frames += 1
-                    if nonzero_frames > 5:
-                        
-                        dart_center = computeDartToPosition(fgMask)
-                        dart_found = True
-                        nonzero_frames = 0
+                if computeDart:
+                    if nonzero > slider1 and nonzero < slider2:
+                        nonzero_frames += 1
+                        if nonzero_frames > 5:
+                            
+                            dart_center = computeDartToPosition(fgMask)
+                            dart_found = True
+                            nonzero_frames = 0
 
             if dart_found and frame_ignore_counter < max_frame_ignore_counter:
                 frame_ignore_counter += 1
@@ -217,7 +217,6 @@ def gen_frames():
             org_img = cv2.imread(path)
             org_img = cv2.GaussianBlur(org_img,(25,25),3)
             org_img = cv2.blur(org_img, (100, 100))
-            overlayParameters = True
             noConnection = True
 
         #org_img is a complete image
@@ -239,14 +238,16 @@ def gen_frames():
         else:
             img_to_show = org_img
 
-
+        if noConnection:
+            cv2.putText(img_to_show,"Keine Verbindung zur Kamera!",(10,30),cv2.FONT_HERSHEY_PLAIN,2,(0,0,0),3)
         if overlayParameters:
-            if noConnection:
-                cv2.putText(img_to_show,"Keine Verbindung zur Kamera!",(10,30),cv2.FONT_HERSHEY_PLAIN,2,(0,0,0),3)
-            localtime = datetime.datetime.now()
-            cv2.putText(img_to_show,str(localtime),(10,70),cv2.FONT_HERSHEY_PLAIN,2,(0,0,0),3)
-            cv2.putText(img_to_show,str(slider1),(10,110),cv2.FONT_HERSHEY_PLAIN,2,(0,0,0),3)
-            cv2.putText(img_to_show,str(slider2),(10,150),cv2.FONT_HERSHEY_PLAIN,2,(0,0,0),3)
+           
+            cv2.putText(img_to_show,str(slider1),(10,110),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
+            cv2.putText(img_to_show,str(slider2),(10,150),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
+        localtime = datetime.datetime.now()
+
+
+        cv2.putText(img_to_show,str(localtime),(10,int(img_to_show.shape[0]*0.98)),cv2.FONT_HERSHEY_PLAIN,int(img_to_show.shape[0]/450),(0,0,0),2)
 
 
         ret, buffer = cv2.imencode('.jpg', img_to_show)
@@ -256,8 +257,11 @@ def gen_frames():
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
         #time.sleep(0.5)
 
-@app.route('/video_feed_1')
-def video_feed_1():
+@app.route('/video_feed')
+def video_feed():
+    global computeDart
+    computeDart = request.args.get('computedart', default = False, type = bool)
+    print("Compute Dart Argument from Client: ", computeDart)
     #Video streaming route. Put this in the src attribute of an img tag
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
