@@ -1,7 +1,7 @@
 import cv2
 from flask import Flask, render_template, Response
 import time
-import imutils
+import imutils, datetime
 
 camera = cv2.VideoCapture("/dev/video14")
 #camera = cv2.VideoCapture(0,cv2.CAP_DSHOW)
@@ -25,8 +25,11 @@ def gen_frames():
             if not success:
                 break
             else:
-                if frame.shape[0] > 768:
-                    frame = imutils.resize(frame, height=768)
+                if frame.shape[0] > 540:
+                    frame = imutils.resize(frame, height=540)
+
+                localtime = datetime.datetime.now()
+                cv2.putText(frame,str(localtime),(10,int(frame.shape[0]*0.98)),cv2.FONT_HERSHEY_PLAIN,int(frame.shape[0]/450),(0,0,0),2)
                 ret, buffer = cv2.imencode('.jpg', frame)
                 frame = buffer.tobytes()
                 yield (b'--frame\r\n'
