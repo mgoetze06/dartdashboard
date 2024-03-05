@@ -7,6 +7,7 @@ var socket = io();
     var wurf_nr = 0;
     var type = "S";
     
+    socket.emit('init_connection', {data: 'connected!'});
 
     // When the user clicks the button, open the modal 
     function openModalMenu() {
@@ -30,6 +31,17 @@ var socket = io();
           modal.style.display = "none";
 
         }
+
+        var spieldialog = document.getElementById("spieldialog");
+        if (spieldialog != null){
+          spieldialog.style.display = "none";
+
+        }
+        var maindialog = document.getElementById("maindialog");
+        if (maindialog != null){
+          maindialog.style.display = "block";
+        }
+
     }
     
     // When the user clicks anywhere outside of the modal, close it
@@ -38,6 +50,16 @@ var socket = io();
 
       if (event.target == modal) {
         modal.style.display = "none";
+        var spieldialog = document.getElementById("spieldialog");
+        if (spieldialog != null){
+          spieldialog.style.display = "none";
+  
+        }
+        
+        var maindialog = document.getElementById("maindialog");
+        if (maindialog != null){
+          maindialog.style.display = "block";
+        }
       }
 
       //var modal = document.getElementById("winnerModal");
@@ -45,6 +67,36 @@ var socket = io();
       //  modal.style.display = "none";
       // }
     }
+    
+    socket.on('init_player_selection', function(msg) {
+      //$('#textBox').append('<p>Received: ' + msg.data + '</p>'
+      var options = "";
+      options += "<option selected>Spieler auswählen</option>";
+      console.log(msg.data)
+      var result = msg.data.replaceAll("(","");
+      result = result.replaceAll(")","");
+      result = result.replaceAll("]","");
+      result = result.replaceAll("[","");
+      result = result.replaceAll(",, ",",");
+      result = result.replaceAll("'","");
+
+      const myArray = result.split(",");
+      console.log(myArray)
+
+      for(var i = 0; i < myArray.length; i++){
+        console.log(myArray[i]);
+        if(myArray[i].length > 0){
+          options += "<option value="+ myArray[i]+">"+ myArray[i] +"</option>";
+
+        }
+      }
+      document.getElementById('selectplayer1').innerHTML = options;
+      document.getElementById('selectplayer2').innerHTML = options;
+
+    });
+
+
+
     socket.on('init_names', function(msg) {
       //$('#textBox').append('<p>Received: ' + msg.data + '</p>');
       document.getElementById('name1').value = msg.spieler1;
@@ -103,9 +155,9 @@ var socket = io();
             document.getElementById(wurf_id).style.backgroundColor = null;
         }
     });
-    socket.on('connect', function() {
-        socket.emit('my event', {data: 'I\'m connected!'});
-    });
+    //socket.on('connect', function() {
+    //   socket.emit('init_connection', {data: 'connected!'});
+    //});
     socket.on('avg', function(msg) {
 
         var id = "avgSpieler" + msg.spielerid;
@@ -215,36 +267,67 @@ function fordereSpielerwechsel(){
     }
   }
 
-  function sendBroadcast(){
-    //SPIEL STARTEN
-    if (confirm("Spiel starten?") == true) {
-        //text = "You pressed OK!";
-      closeModal()
-      counter++;
-      socket.emit('init event', {data: counter});
-      document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
-      document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#ecedef";
-      //document.getElementById('PunktEingabeFrei').value = "";
-      for(var i = 1; i < 4; i++){
-              wurf_id = "wurf1" + i;
-              wurf_id2 = "wurf2" + i;
-              document.getElementById(wurf_id).value = "";
-              document.getElementById(wurf_id2).value = "";
-      }
-      document.getElementById("avgSpieler1").value = "";
-      document.getElementById("avgSpieler2").value = "";
-      document.getElementById("visitscoreSpieler1").value = "";
-      document.getElementById("visitscoreSpieler2").value = "";
-      document.getElementById("dartscount1").value = "";
-      document.getElementById("dartscount2").value = "";
-      document.getElementById("double").style.backgroundColor = "#ecedef";
-      document.getElementById("triple").style.backgroundColor = "#ecedef";
-      document.getElementById("bull").disabled = false;
-      document.getElementById("bull").style.backgroundColor = "#ecedef";
-    } else {
-      //text = "You canceled!";
-    }
+  function addPlayer(){
+    var name=prompt("Spielername eingeben","Harry Potter");
+    if (name!=null){
+      // x="Hello " + name + "! How are you today?";
+      //alert(x);s
 
+      var result = name.replaceAll(" ","");
+      socket.emit('new_player', {name: result});
+
+   }
+  }
+
+
+  function openSpielDialog(){
+    var spieldialog = document.getElementById("spieldialog");
+    spieldialog.style.display = "block";
+    var maindialog = document.getElementById("maindialog");
+    maindialog.style.display = "none";
+  }
+
+  function sendBroadcast(){
+
+    name1 = document.getElementById('selectplayer1').value;
+
+    name2 = document.getElementById('selectplayer2').value;
+
+    if (name1 != "Spieler auswählen" && name2 != "Spieler auswählen" && name1 != name2){
+
+      var confirmation = "Spiel starten? (" + name1 + " gegen " + name2 +")";
+      //SPIEL STARTEN
+      if (confirm(confirmation) == true) {
+          //text = "You pressed OK!";
+        closeModal()
+        counter++;
+        socket.emit('init event', {player1: name1, player2: name2});
+        document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
+        document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#ecedef";
+        //document.getElementById('PunktEingabeFrei').value = "";
+        for(var i = 1; i < 4; i++){
+                wurf_id = "wurf1" + i;
+                wurf_id2 = "wurf2" + i;
+                document.getElementById(wurf_id).value = "";
+                document.getElementById(wurf_id2).value = "";
+                document.getElementById(wurf_id).style.backgroundColor = 'none';
+                document.getElementById(wurf_id2).style.backgroundColor = 'none';
+
+        }
+        document.getElementById("avgSpieler1").value = "";
+        document.getElementById("avgSpieler2").value = "";
+        document.getElementById("visitscoreSpieler1").value = "";
+        document.getElementById("visitscoreSpieler2").value = "";
+        document.getElementById("dartscount1").value = "";
+        document.getElementById("dartscount2").value = "";
+        document.getElementById("double").style.backgroundColor = "#ecedef";
+        document.getElementById("triple").style.backgroundColor = "#ecedef";
+        document.getElementById("bull").disabled = false;
+        document.getElementById("bull").style.backgroundColor = "#ecedef";
+      } else {
+        //text = "You canceled!";
+      }
+    }
   }
   function setColor(object){
     console.log("touch event");

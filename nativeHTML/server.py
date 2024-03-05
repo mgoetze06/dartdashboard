@@ -497,14 +497,69 @@ def handle_zurueck():
         sendeAufnahmeZuEinzelnenWürfen(aufnahme,id)
         UpdateSpielstand()
     
+@socketio.on('new_player')
+def new_player(message):
+    global database_path
+    connection = sqlite3.connect(database_path)
+
+    cursor = connection.cursor()
+
+    cursor.execute("Select Name from dartgame_players where Name = '"+ str(message["name"]) +"'")
+    rows = cursor.fetchone()
+    if rows == None:
+
+        query = "Insert into dartgame_players (Name,Spiele_Gesamt,Letztes_Spiel,Letzter_Average,Durchschnitt_Average)"
+        query = query + " VALUES ('" + str(message["name"]) + "',0,'',0,0)"
+        #     query = "INSERT INTO dartgame_details (Wurf_Nummer,Wurf_Wert,Aufnahme,Fehler,Punktstand,Punktstand_INV,Wurf_Gesamt,Avg,Wurf_Typ,Spieler_ID,Game_ID,Wurf_Nummer_Gesamt)"
 
 
+        cursor.execute(query)
 
+        connection.commit()
+        print("Spieler " + str(message["name"]) + " wurde hinzugefügt.")
+
+    else:
+        print("Spieler " + str(message["name"]) + " bereits vorhanden.")
+
+    connection.close()
+
+    initPlayers()
+
+
+@socketio.on('init_connection')
+def init_connection(message):
+    initPlayers()
+    print("players table created/updated. Connection established.")
+
+    try:
+        UpdateSpielstand()
+    except:
+        print("kein Spiel gestartet.")
+ 
 @socketio.on('init event')
 def test_message(message):
-    initGame()
+    name1 = message["player1"]
+    name2 = message["player2"]
+    initGame(name1,name2)
 
-def initGame():
+def initPlayers():
+    global database_path
+    connection = sqlite3.connect(database_path)
+
+    cursor = connection.cursor()
+    cursor.execute("CREATE TABLE IF NOT EXISTS dartgame_players (Name STRING, Spiele_Gesamt Integer, Letztes_Spiel String, Letzter_Average REAL, Durchschnitt_Average REAL);")
+    connection.commit()
+
+    cursor.execute("SELECT DISTINCT Name FROM dartgame_players")
+    all_players = cursor.fetchall()
+    if all_players != None:
+        print(all_players)
+
+    #emit('spieler_wechsel', {'spieler': 'Spieler2'}, broadcast=True)
+    emit('init_player_selection',{'data': str(all_players)}, broadcast=True)
+
+
+def initGame(name1=None,name2=None):
     global database_path, game_id, winner
     connection = sqlite3.connect(database_path)
 
@@ -523,8 +578,10 @@ def initGame():
 
     time = str(datetime.datetime.now())
 
-    name1 = "Lini"
-    name2 = "Rici"
+    if name1 == None:
+        name1 = "Lini"
+    if name2 == None:
+        name2 = "Rici"
 
     query = "INSERT INTO dartgame_header ('Game_ID','Typ','Typ_Punktstand','Spieler1_ID','Spieler2_ID','Spieler1_Name','Spieler2_Name','Ergebnis','Startzeit')"
     query = query +  "VALUES ("+ str(game_id) + ",'DoubleOut',501,1,2,'" + str(name1) + "','" + str(name2) + "','läuft','" + time + "')"

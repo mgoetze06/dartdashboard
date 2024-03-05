@@ -9,7 +9,7 @@
   </head>
   <script type="text/javascript" src="/static/script.js"> </script>
 
-<body>
+<body tabindex="-1">
         <!-- Trigger/Open The Modal 
     <button id="myBtn" class="menu" onclick="openModalMenu()">ALBS Dart Menü</button>-->
     <div class="menu">
@@ -26,9 +26,19 @@
     <!-- Modal content -->
     <div class="modal-content">
         <!-- <span class="close" onclick="closeModal()">&times;</span> -->
-        <input type="button" value = "Spiel starten" class="buttonValues"onclick="sendBroadcast()">
-        <input type="button" value = "Kamerastreams" class="buttonValues"onclick="location.href='/streams'"><br>
-        <input type="button" value = "Letzten Wurf rückgängig" class="buttonValues" onclick="sendZurueck()"><br>
+        <div id="spieldialog" style="display: none;">
+            Spieler 1:
+            <select id="selectplayer1"></select><br>
+            <br>
+            Spieler 2:
+            <select id="selectplayer2"></select>
+            <input type="button" value = "Spiel Starten" class="buttonValues" onclick="sendBroadcast()">
+        </div>
+        <div id="maindialog" style="display: block;">
+            <input type="button" value = "Neues Spiel" class="buttonValues" onclick="openSpielDialog()">
+            <input type="button" value = "Kamerastreams" class="buttonValues" onclick="location.href='/streams'"><br>
+            <input type="button" value = "Spieler hinzufügen" class="buttonValues" onclick="addPlayer()"><br>
+        </div>
         <!--<img src="http://192.168.0.213:8100/video_feed_1" width="50%">-->
     </div>
     </div>  
