@@ -27,7 +27,7 @@ def gen_frames():
             else:
                 if frame.shape[0] > 540:
                     frame = imutils.resize(frame, height=540)
-
+                frame = imutils.rotate(frame,90)
                 localtime = datetime.datetime.now()
                 cv2.putText(frame,str(localtime),(10,int(frame.shape[0]*0.98)),cv2.FONT_HERSHEY_PLAIN,int(frame.shape[0]/450),(0,0,0),2)
                 ret, buffer = cv2.imencode('.jpg', frame)
