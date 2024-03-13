@@ -45,3 +45,4 @@ esp_display/old/simplewebserver/secrets.h
 esp_display/old/webserver_2displays/secrets.h
 esp_display/old/WebSocketClientSocketIO/WebSocketClientSocketIO/secrets.h
 esp_display/old/
+nativeHTML/server.txt

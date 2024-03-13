@@ -5,6 +5,8 @@ import sqlite3
 import os,sys
 import requests
 import json, datetime
+import paramiko
+
 
 url = "http://192.168.0.214/update"
 data = {'punkte0': '501', 'punkte1': '501', 'spieler': '0'}
@@ -497,6 +499,36 @@ def handle_zurueck():
         sendeAufnahmeZuEinzelnenWürfen(aufnahme,id)
         UpdateSpielstand()
     
+@socketio.on('restart_server_service')
+def restartService(data=None):
+    if data == None:
+        return
+    ssh = paramiko.SSHClient()
+
+    user = "boris"
+
+    f = open("server.txt", "r")
+
+    password = f.read()
+
+    f.close()
+
+    server = data["server"]
+
+    #cmd_to_execute = "sudo systemctl restart boris.service"
+    cmd_to_execute = data["cmd"]
+
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    ssh.connect(server, username=user, password=password)
+
+    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
+
+    for line in ssh_stdout.readlines():
+        print(line)
+
+
+
 @socketio.on('new_player')
 def new_player(message):
     global database_path

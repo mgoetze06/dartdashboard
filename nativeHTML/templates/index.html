@@ -36,6 +36,7 @@
         </div>
         <div id="maindialog" style="display: block;">
             <input type="button" value = "Neues Spiel" class="buttonValues" onclick="openSpielDialog()">
+            <input type="button" value = "Kamera neustarten" class="buttonValues" onclick="restartCameras()">
             <input type="button" value = "Kamerastreams" class="buttonValues" onclick="location.href='/streams'"><br>
             <input type="button" value = "Spieler hinzufügen" class="buttonValues" onclick="addPlayer()"><br>
         </div>
@@ -53,7 +54,7 @@
     </div>
     </div>
     <div class="beideSpieler">
-    <div id="spieler" class="spieler Spieler1">
+    <div id="spieler" class="spieler Spieler1" tabindex="-1">
         <table id="calcu" width="100%">
             <tr>
                 <td colspan="3" width="60%">Spieler1: <input class="wurf inputbox names" type="text" readonly id="name1"></td>
@@ -77,7 +78,7 @@
             </tr>
         </table>    
     </div>
-    <div id="spieler" class="spieler Spieler2">
+    <div id="spieler" class="spieler Spieler2" tabindex="-1">
         <table id="calcu" width="100%">
             <tr>
                 <td colspan="3" width="60%">Spieler2: <input class="wurf inputbox names" type="text" readonly id="name2"></td>
@@ -103,16 +104,19 @@
     </div>
     </div>
     <div class="beideSpieler">
+        <div id="stream" style="width: auto;">
+            <img src="http://192.168.0.213:8100/video_feed_1" alt='Server an http://192.168.0.213:8100 nicht gefunden.' onclick="location.href='http://192.168.0.213:8100'" class="rotate90">
+
+          <!--<button onclick="location.href='index.html'">Vollbild Video 2</button>-->
+        </div>
         <div id="stream">
           <img src="http://192.168.0.101:8100/video_feed?computedart=True" alt='Server an http://192.168.0.101:8100 nicht gefunden.' id="streamimage" onclick="location.href='http://192.168.0.101:8100'">
       
         </div>
-        <div id="stream">
-          <img src="http://192.168.0.213:8100/video_feed_1" alt='Server an http://192.168.0.213:8100 nicht gefunden.' onclick="location.href='http://192.168.0.213:8100'">
-          <!--<button onclick="location.href='index.html'">Vollbild Video 2</button>-->
-        </div>
+
       </div>
-    <div id="center">
+
+    <div id="center" tabindex="-1">
           <table id="calcu" width="100%">
               <tr>
                   <td><input type="button" class="buttonValues" value="1" onclick="sendWurf(this)" ontouchstart="setColor(this)" ontouchend="releaseColor(this)"></td>

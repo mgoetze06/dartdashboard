@@ -193,6 +193,12 @@ var socket = io();
     
   }
 
+function restartCameras(){
+  socket.emit('restart_server_service', {server: "192.168.0.213", cmd: "sudo systemctl restart boris.service"});
+  //socket.emit('restart_server_service', {server: "192.168.0.101", cmd: "sudo systemctl status boris.service"});
+  closeModal();
+}
+
 function fordereSpielerwechsel(){
   socket.emit('fordereSpielerwechsel', {data: "wechsel"});
 
