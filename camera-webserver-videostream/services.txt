@@ -9,7 +9,14 @@ ExecStart=/usr/bin/python3 /home/boris/webserver/poweroff.py
 [Install]
 WantedBy=multi-user.target
 
+
+
+
+
 ######################################################################################
+Service erstellen:
+sudo systemctl --force --full edit boris.service
+
 
 [Unit]
 Description=Getting Usb Camera Input and Serving Flask Webserver
@@ -22,4 +29,18 @@ User=boris
 
 [Install]
 WantedBy=multi-user.target
+
+
+
+
+
+
+#######
+überall sudo ohne passwort:
+
+sudo visudo
+
+Zeile am ende einfügen:
+boris ALL=(ALL) NOPASSWD: ALL
+
 
