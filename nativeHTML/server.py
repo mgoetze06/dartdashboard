@@ -3,10 +3,12 @@ from flask_socketio import SocketIO, emit
 #!/usr/bin/python
 import sqlite3
 import os,sys
-import requests
+import requests,time
 import json, datetime
-import paramiko
-
+try:
+    import paramiko
+except:
+    pass
 
 url = "http://192.168.0.214/update"
 data = {'punkte0': '501', 'punkte1': '501', 'spieler': '0'}
@@ -503,29 +505,42 @@ def handle_zurueck():
 def restartService(data=None):
     if data == None:
         return
-    ssh = paramiko.SSHClient()
-
-    user = "boris"
-
-    f = open("server.txt", "r")
-
-    password = f.read()
-
-    f.close()
-
+    
     server = data["server"]
+    if server == "192.168.0.101":
+        print("Invoking reset and init on gphoto server 192.168.0.101")
+        requests.get("http://192.168.0.101:8100/reset")      
+        time.sleep(5) 
 
-    #cmd_to_execute = "sudo systemctl restart boris.service"
-    cmd_to_execute = data["cmd"]
+        requests.get("http://192.168.0.101:8100/init")        
 
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
-    ssh.connect(server, username=user, password=password)
+    else:
 
-    ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
+        ssh = paramiko.SSHClient()
 
-    for line in ssh_stdout.readlines():
-        print(line)
+        if server == "192.168.0.100":
+            user = "root"
+        else:
+            user = "boris"
+        f = open("server.txt", "r")
+
+        password = f.read()
+
+        f.close()
+
+
+        #cmd_to_execute = "sudo systemctl restart boris.service"
+        cmd_to_execute = data["cmd"]
+
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+        ssh.connect(server, username=user, password=password)
+
+        ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(cmd_to_execute)
+
+        for line in ssh_stdout.readlines():
+            print(line)
 
 
 

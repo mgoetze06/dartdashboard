@@ -101,6 +101,8 @@ var socket = io();
       //$('#textBox').append('<p>Received: ' + msg.data + '</p>');
       document.getElementById('name1').value = msg.spieler1;
       document.getElementById('name2').value = msg.spieler2;
+      closeModal();
+      initAllFields();
 
     });
     socket.on('spielstand_update', function(msg) {
@@ -195,7 +197,10 @@ var socket = io();
 
 function restartCameras(){
   socket.emit('restart_server_service', {server: "192.168.0.213", cmd: "sudo systemctl restart boris.service"});
-  //socket.emit('restart_server_service', {server: "192.168.0.101", cmd: "sudo systemctl status boris.service"});
+  //socket.emit('restart_server_service', {server: "192.168.0.101", cmd: "pkill -f gphoto2"});
+
+  socket.emit('restart_server_service', {server: "192.168.0.101", cmd: ""});
+
   closeModal();
 }
 
@@ -308,28 +313,7 @@ function fordereSpielerwechsel(){
         closeModal()
         counter++;
         socket.emit('init event', {player1: name1, player2: name2});
-        document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
-        document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#ecedef";
-        //document.getElementById('PunktEingabeFrei').value = "";
-        for(var i = 1; i < 4; i++){
-                wurf_id = "wurf1" + i;
-                wurf_id2 = "wurf2" + i;
-                document.getElementById(wurf_id).value = "";
-                document.getElementById(wurf_id2).value = "";
-                document.getElementById(wurf_id).style.backgroundColor = 'none';
-                document.getElementById(wurf_id2).style.backgroundColor = 'none';
-
-        }
-        document.getElementById("avgSpieler1").value = "";
-        document.getElementById("avgSpieler2").value = "";
-        document.getElementById("visitscoreSpieler1").value = "";
-        document.getElementById("visitscoreSpieler2").value = "";
-        document.getElementById("dartscount1").value = "";
-        document.getElementById("dartscount2").value = "";
-        document.getElementById("double").style.backgroundColor = "#ecedef";
-        document.getElementById("triple").style.backgroundColor = "#ecedef";
-        document.getElementById("bull").disabled = false;
-        document.getElementById("bull").style.backgroundColor = "#ecedef";
+        initAllFields();
       } else {
         //text = "You canceled!";
       }
@@ -346,4 +330,30 @@ function fordereSpielerwechsel(){
     object.style.backgroundColor = "#ecedef";
     object.style.color = "#235558";
     //document.getElementById("bull").style.backgroundColor = "red";
+  }
+
+
+  function initAllFields(){
+    document.getElementsByClassName("Spieler1")[0].style.backgroundColor = "#bfe0c4";
+    document.getElementsByClassName("Spieler2")[0].style.backgroundColor = "#ecedef";
+    //document.getElementById('PunktEingabeFrei').value = "";
+    for(var i = 1; i < 4; i++){
+            wurf_id = "wurf1" + i;
+            wurf_id2 = "wurf2" + i;
+            document.getElementById(wurf_id).value = "";
+            document.getElementById(wurf_id2).value = "";
+            document.getElementById(wurf_id).style.backgroundColor = 'none';
+            document.getElementById(wurf_id2).style.backgroundColor = 'none';
+
+    }
+    document.getElementById("avgSpieler1").value = "";
+    document.getElementById("avgSpieler2").value = "";
+    document.getElementById("visitscoreSpieler1").value = "";
+    document.getElementById("visitscoreSpieler2").value = "";
+    document.getElementById("dartscount1").value = "";
+    document.getElementById("dartscount2").value = "";
+    document.getElementById("double").style.backgroundColor = "#ecedef";
+    document.getElementById("triple").style.backgroundColor = "#ecedef";
+    document.getElementById("bull").disabled = false;
+    document.getElementById("bull").style.backgroundColor = "#ecedef";
   }

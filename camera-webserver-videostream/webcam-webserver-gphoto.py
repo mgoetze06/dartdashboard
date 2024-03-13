@@ -11,6 +11,7 @@ import io
 import numpy as np
 from flask import request
 from numpy import genfromtxt
+import json
 
 #camera = cv2.VideoCapture("/dev/video14")
 #camera = cv2.VideoCapture(0,cv2.CAP_DSHOW)
@@ -62,6 +63,7 @@ try:
         gp.check_result(gp.gp_camera_set_config(camera, config))
     # capture preview image (not saved to camera memory card)
     print('Capturing preview image')
+    restartingGphoto = False
 except:
     print("gphoto nicht gefunden.")
 
@@ -149,113 +151,116 @@ def executeTransformation(img,matrix):
 def gen_frames():
     global max_frame_ignore_counter,noConnection,frame_ignore_counter,dart_found,nonzero_frames,slider2,slider1,setupPoints,matrix,overlayParameters
     while True:
-        try:
-
-            #camerashutter 1/80 f4.5 canon dslr 1100d
-
-            #success, frame = camera.read()  # read the camera frame
-            a = datetime.datetime.now()
-            camera_file = gp.check_result(gp.gp_camera_capture_preview(camera))
-            file_data = gp.check_result(gp.gp_file_get_data_and_size(camera_file))
-            # display image
-            data = memoryview(file_data)
-            #print(type(data), len(data))
-            #print(data[:10].tolist())
-            image_io = io.BytesIO(file_data)
-            #image = Image.open(image_io)
-            #image.show()
-            #print(image.size)
-            #print(image_io)
-            image_io.seek(0)
-            org_img = cv2.imdecode(np.frombuffer(image_io.read(), np.uint8), 1)
-            #scr_w,scr_h = 1920,1080
-            #if org_img.shape[1] > 1080:
-            #    org_img = imutils.resize(org_img, width=1080)
-            fgMask = backSub.apply(org_img)
-            if not dart_found:
-                nonzero = np.count_nonzero(fgMask)
-                #if not success:
-                #    #print("camera not available")
-                #    path = os.path.join(os.getcwd(),"noconnection.jpg")
-                #    #print(path)
-                #    frame = cv2.imread(path)
-                #    #frame = cv2.GaussianBlur(frame,(25,25),3)
-                #    frame = cv2.blur(frame, (100, 100))
-                #    cv2.putText(frame,"Keine Verbindung zur Kamera!",(100,200),cv2.FONT_HERSHEY_PLAIN,15,(0,0,0),3)
-                #    localtime = datetime.datetime.now()
-                #    cv2.putText(frame,str(localtime),(100,450),cv2.FONT_HERSHEY_PLAIN,10,(0,0,0),3)
-                if nonzero < (slider2+1000):
-                    localtime = datetime.datetime.now()
-                    #cv2.putText(org_img,str(localtime),(10,20),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
-                    #cv2.putText(org_img,str(nonzero),(10,40),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
-                    redImg = np.zeros(org_img.shape, org_img.dtype)
-                    redImg[:,:] = (0, 0, 255)
-                    redMask = cv2.bitwise_and(redImg, redImg, mask=fgMask)
-                    cv2.addWeighted(redMask, 1, org_img, 1, 0, org_img)
-                if computeDart:
-                    if nonzero > slider1 and nonzero < slider2:
-                        nonzero_frames += 1
-                        if nonzero_frames > 5:
-                            
-                            dart_center = computeDartToPosition(fgMask)
-                            dart_found = True
-                            nonzero_frames = 0
-
-            if dart_found and frame_ignore_counter < max_frame_ignore_counter:
-                frame_ignore_counter += 1
-                cv2.circle(org_img,(dart_center[0],dart_center[1]),50,(255,255,255),2)
-                cv2.circle(org_img,(dart_center[0],dart_center[1]),15,(153,153,0),4)
-                cv2.circle(org_img,(dart_center[0],dart_center[1]),3,(255,0,0),3)
-            else:
-                frame_ignore_counter = 0
-                dart_found = False
-
-        except:
-            #print("broke: camera not available")
-            path = os.path.join(os.getcwd(),"camera-webserver-videostream","dartscheibe_lowres.jpg")
-            #print(path)
-            org_img = cv2.imread(path)
-            org_img = cv2.GaussianBlur(org_img,(25,25),3)
-            org_img = cv2.blur(org_img, (100, 100))
-            noConnection = True
-
-        #org_img is a complete image
-        if overlayParameters:
-            for point in setupPoints:
-                cv2.circle(org_img,(point[0],point[1]),3,(255,0,0),10)
-        if matrix is None:
-            if len(setupPoints) == 4:
-                matrix = setupTransformation(np.float32(setupPoints))
-            else:
-                if os.path.exists("setup_points.csv"):
-                    pts1 = genfromtxt("setup_points.csv", delimiter=',',dtype=np.float32) 
-                    matrix = setupTransformation(pts1)
+        if not restartingGphoto:
+            try:
             
-        if matrix is not None:
-            img_to_show = executeTransformation(org_img,matrix)
+                #camerashutter 1/80 f4.5 canon dslr 1100d
+
+                #success, frame = camera.read()  # read the camera frame
+                a = datetime.datetime.now()
+                camera_file = gp.check_result(gp.gp_camera_capture_preview(camera))
+                file_data = gp.check_result(gp.gp_file_get_data_and_size(camera_file))
+                # display image
+                data = memoryview(file_data)
+                #print(type(data), len(data))
+                #print(data[:10].tolist())
+                image_io = io.BytesIO(file_data)
+                #image = Image.open(image_io)
+                #image.show()
+                #print(image.size)
+                #print(image_io)
+                image_io.seek(0)
+                org_img = cv2.imdecode(np.frombuffer(image_io.read(), np.uint8), 1)
+                #scr_w,scr_h = 1920,1080
+                #if org_img.shape[1] > 1080:
+                #    org_img = imutils.resize(org_img, width=1080)
+                fgMask = backSub.apply(org_img)
+                if not dart_found:
+                    nonzero = np.count_nonzero(fgMask)
+                    #if not success:
+                    #    #print("camera not available")
+                    #    path = os.path.join(os.getcwd(),"noconnection.jpg")
+                    #    #print(path)
+                    #    frame = cv2.imread(path)
+                    #    #frame = cv2.GaussianBlur(frame,(25,25),3)
+                    #    frame = cv2.blur(frame, (100, 100))
+                    #    cv2.putText(frame,"Keine Verbindung zur Kamera!",(100,200),cv2.FONT_HERSHEY_PLAIN,15,(0,0,0),3)
+                    #    localtime = datetime.datetime.now()
+                    #    cv2.putText(frame,str(localtime),(100,450),cv2.FONT_HERSHEY_PLAIN,10,(0,0,0),3)
+                    if nonzero < (slider2+1000):
+                        localtime = datetime.datetime.now()
+                        #cv2.putText(org_img,str(localtime),(10,20),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
+                        #cv2.putText(org_img,str(nonzero),(10,40),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
+                        redImg = np.zeros(org_img.shape, org_img.dtype)
+                        redImg[:,:] = (0, 0, 255)
+                        redMask = cv2.bitwise_and(redImg, redImg, mask=fgMask)
+                        cv2.addWeighted(redMask, 1, org_img, 1, 0, org_img)
+                    if computeDart:
+                        if nonzero > slider1 and nonzero < slider2:
+                            nonzero_frames += 1
+                            if nonzero_frames > 5:
+                                
+                                dart_center = computeDartToPosition(fgMask)
+                                dart_found = True
+                                nonzero_frames = 0
+
+                if dart_found and frame_ignore_counter < max_frame_ignore_counter:
+                    frame_ignore_counter += 1
+                    cv2.circle(org_img,(dart_center[0],dart_center[1]),50,(255,255,255),2)
+                    cv2.circle(org_img,(dart_center[0],dart_center[1]),15,(153,153,0),4)
+                    cv2.circle(org_img,(dart_center[0],dart_center[1]),3,(255,0,0),3)
+                else:
+                    frame_ignore_counter = 0
+                    dart_found = False
+
+            except:
+                #print("broke: camera not available")
+                path = os.path.join(os.getcwd(),"camera-webserver-videostream","dartscheibe_lowres.jpg")
+                #print(path)
+                org_img = cv2.imread(path)
+                org_img = cv2.GaussianBlur(org_img,(25,25),3)
+                org_img = cv2.blur(org_img, (100, 100))
+                noConnection = True
+
+            #org_img is a complete image
+            if overlayParameters:
+                for point in setupPoints:
+                    cv2.circle(org_img,(point[0],point[1]),3,(255,0,0),10)
+            if matrix is None:
+                if len(setupPoints) == 4:
+                    matrix = setupTransformation(np.float32(setupPoints))
+                else:
+                    if os.path.exists("setup_points.csv"):
+                        pts1 = genfromtxt("setup_points.csv", delimiter=',',dtype=np.float32) 
+                        matrix = setupTransformation(pts1)
+                
+            if matrix is not None:
+                img_to_show = executeTransformation(org_img,matrix)
 
 
+            else:
+                img_to_show = org_img
+
+            if noConnection:
+                cv2.putText(img_to_show,"Keine Verbindung zur Kamera!",(10,30),cv2.FONT_HERSHEY_PLAIN,2,(0,0,0),3)
+            if overlayParameters:
+            
+                cv2.putText(img_to_show,str(slider1),(10,110),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
+                cv2.putText(img_to_show,str(slider2),(10,150),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
+            localtime = datetime.datetime.now()
+
+
+            cv2.putText(img_to_show,str(localtime),(10,int(img_to_show.shape[0]*0.98)),cv2.FONT_HERSHEY_PLAIN,int(img_to_show.shape[0]/450),(0,0,0),2)
+
+
+            ret, buffer = cv2.imencode('.jpg', img_to_show)
+            frame = buffer.tobytes()
+            #frame = image_io.read()
+            yield (b'--frame\r\n'
+                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            #time.sleep(0.5)
         else:
-            img_to_show = org_img
-
-        if noConnection:
-            cv2.putText(img_to_show,"Keine Verbindung zur Kamera!",(10,30),cv2.FONT_HERSHEY_PLAIN,2,(0,0,0),3)
-        if overlayParameters:
-           
-            cv2.putText(img_to_show,str(slider1),(10,110),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
-            cv2.putText(img_to_show,str(slider2),(10,150),cv2.FONT_HERSHEY_PLAIN,1,(0,0,0),1)
-        localtime = datetime.datetime.now()
-
-
-        cv2.putText(img_to_show,str(localtime),(10,int(img_to_show.shape[0]*0.98)),cv2.FONT_HERSHEY_PLAIN,int(img_to_show.shape[0]/450),(0,0,0),2)
-
-
-        ret, buffer = cv2.imencode('.jpg', img_to_show)
-        frame = buffer.tobytes()
-        #frame = image_io.read()
-        yield (b'--frame\r\n'
-            b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        #time.sleep(0.5)
+            time.sleep(0.5)
 
 @app.route('/video_feed')
 def video_feed():
@@ -269,6 +274,61 @@ def video_feed():
 def index():
     """Video streaming home page."""
     return render_template('fullscreen1.html')
+
+@app.route('/reset')
+def resetCamera():
+    global camera,restartingGphoto
+    #gp.check_result(gp.gp_camera_exit(camera))
+    restartingGphoto = True
+    subprocess.run(["pkill", "-f", "gphoto2"])
+
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
+
+@app.route('/init')
+def initCamera():
+    global camera
+    try:
+        #subprocess.run(["pkill", "-f", "gphoto2"])
+        #locale.setlocale(locale.LC_ALL, '')
+        #logging.basicConfig(
+        #    format='%(levelname)s: %(name)s: %(message)s', level=logging.WARNING)
+        callback_obj = gp.check_result(gp.use_python_logging())
+        camera = gp.check_result(gp.gp_camera_new())
+        gp.check_result(gp.gp_camera_init(camera))
+        # required configuration will depend on camera type!
+        print('Checking camera config')
+        # get configuration tree
+        config = gp.check_result(gp.gp_camera_get_config(camera))
+        # find the image format config item
+        # camera dependent - 'imageformat' is 'imagequality' on some
+        OK, image_format = gp.gp_widget_get_child_by_name(config, 'imageformat')
+        if OK >= gp.GP_OK:
+            # get current setting
+            value = gp.check_result(gp.gp_widget_get_value(image_format))
+            # make sure it's not raw
+            if 'raw' in value.lower():
+                print('Cannot preview raw images')
+                exit
+        # find the capture size class config item
+        # need to set this on my Canon 350d to get preview to work at all
+        OK, capture_size_class = gp.gp_widget_get_child_by_name(
+            config, 'capturesizeclass')
+        if OK >= gp.GP_OK:
+            # set value
+            value = gp.check_result(gp.gp_widget_get_choice(capture_size_class, 2))
+            gp.check_result(gp.gp_widget_set_value(capture_size_class, value))
+            # set config
+            gp.check_result(gp.gp_camera_set_config(camera, config))
+        # capture preview image (not saved to camera memory card)
+        print('Capturing preview image')
+        restartingGphoto = False
+
+    except:
+        print("gphoto nicht gefunden.")#
+
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'} 
+
+
 
 @app.route('/send/<data>')
 def send_ir_command(data):
