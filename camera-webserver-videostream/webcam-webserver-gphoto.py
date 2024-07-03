@@ -3,7 +3,7 @@ from flask import Flask, render_template, Response
 import time, datetime
 import os
 import subprocess
-import gphoto2 as gp
+#import gphoto2 as gp
 from skimage.morphology import thin
 from skimage import exposure
 import imutils
@@ -27,7 +27,7 @@ import json
 
 #print("Frame resolution set to: (" + str(camera.get(cv2.CAP_PROP_FRAME_WIDTH)) + "; ")
 app = Flask(__name__)
-
+restartingGphoto = False
 
 try:
     subprocess.run(["pkill", "-f", "gphoto2"])
@@ -148,6 +148,60 @@ def executeTransformation(img,matrix):
 
     return flipped
 
+def executeMasking(img):
+    #redImg = np.copy(img)
+    resultImg = np.zeros(img.shape, img.dtype)
+
+
+
+    #redImg[:,:,0] = 0
+    #redImg[:,:,1] = 0
+    
+    #redImg[redImg[:, :, 2] > 200, 2] = 255
+    #redImg[redImg[:, :, 2] < 200, 2] = 0
+    thresh = 150
+    thresh_low = 50
+    mask_R = (img[:, :, 2] > thresh) & (img[:,:,1] < thresh_low) & (img[:,:,0] < thresh_low)
+    #mask_R = np.bitwise_or(mask_R,(img[:, :, 2] > 30) & (img[:,:,1] < 10) & (img[:,:,0] < 10))
+
+
+    mask_R2 = img[:, :, 2] < thresh
+    resultImg[mask_R, 2] = 255
+    resultImg[mask_R2, 2] = 0
+    mask_G = (img[:, :, 1] > thresh//3) & (img[:,:,2] < thresh_low)
+    mask_G2 = img[:, :, 1] < thresh//3
+    resultImg[mask_G, 1] = 255
+    resultImg[mask_G2, 1] = 0
+    #mask_B = img[:, :, 0] > 200
+    #mask_B2 = img[:, :, 0] < 200
+    #resultImg[mask_B, 0] = 255
+    #resultImg[mask_B2, 0] = 0
+
+    # mask = np.bitwise_and(mask_B,mask_G)
+    # mask = np.bitwise_and(mask,mask_R)
+    # resultImg[mask, 0] = 0
+    # resultImg[mask, 1] = 0
+    # resultImg[mask, 2] = 0
+
+    resultImg[(img[:,:,0] >= thresh) & (img[:,:,1] >= thresh) & (img[:,:,2] >= thresh)] = [0,0,0]
+    gray = cv2.cvtColor(resultImg,cv2.COLOR_BGR2GRAY)
+
+    #double and triple areas as binary image
+    (thresh, im_bw) = cv2.threshold(gray, 128, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(2,2))
+
+    dst1 = cv2.morphologyEx(im_bw, cv2.MORPH_OPEN, kernel)
+
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(4,4))
+
+    dst2 = cv2.morphologyEx(dst1, cv2.MORPH_OPEN, kernel)
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(8,8))
+
+    dst = cv2.morphologyEx(dst2, cv2.MORPH_OPEN, kernel)
+
+    return dst
+
 def gen_frames():
     global max_frame_ignore_counter,noConnection,frame_ignore_counter,dart_found,nonzero_frames,slider2,slider1,setupPoints,matrix,overlayParameters
     while True:
@@ -215,11 +269,11 @@ def gen_frames():
 
             except:
                 #print("broke: camera not available")
-                path = os.path.join(os.getcwd(),"camera-webserver-videostream","dartscheibe_lowres.jpg")
+                path = os.path.join(os.getcwd(),"dartscheibe_lowres.jpg")
                 #print(path)
                 org_img = cv2.imread(path)
-                org_img = cv2.GaussianBlur(org_img,(25,25),3)
-                org_img = cv2.blur(org_img, (100, 100))
+                #org_img = cv2.GaussianBlur(org_img,(25,25),3)
+                #org_img = cv2.blur(org_img, (100, 100))
                 noConnection = True
 
             #org_img is a complete image
@@ -236,6 +290,8 @@ def gen_frames():
                 
             if matrix is not None:
                 img_to_show = executeTransformation(org_img,matrix)
+                
+                img_to_show = executeMasking(img_to_show)
 
 
             else:
