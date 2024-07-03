@@ -290,7 +290,7 @@ def gen_frames():
                 
             if matrix is not None:
                 img_to_show = executeTransformation(org_img,matrix)
-                
+                #cv2.imwrite("dartscheibe_transformed.jpg",img_to_show)
                 img_to_show = executeMasking(img_to_show)
 
 
