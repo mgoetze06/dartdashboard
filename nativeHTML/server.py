@@ -435,11 +435,34 @@ def UpdateSpielstand():
     data = {'punkte0': str(p1.punktstand), 'punkte1': str(p2.punktstand), 'spieler': spielerindex}
     SendSpielstandToESP(data)
 
+def getStatsFromDatabase():
+    global database_path
 
+    connection = sqlite3.connect(database_path)
+    cursor = connection.cursor()
+    #gameid with max average
+    query = "SELECT *,o.game_id, Max((Case When o.Spieler1_Avg > o.Spieler2_Avg Then o.Spieler1_Avg ELSE o.Spieler2_Avg END))as maxAVG FROM dartgame_header o where o.Ergebnis <> \"läuft\" and abs(julianday(o.Startzeit)-julianday(o.Endzeit)) > 0.0009"
+    #gameid with longest game
+    #query = "SELECT o.game_id, Max(abs(julianday(o.Endzeit)-julianday(o.Startzeit)))as maxTimeInDays FROM dartgame_header o where o.Ergebnis <> \"läuft\" and abs(julianday(o.Startzeit)-julianday(o.Endzeit)) > 0.0009"
+    #gameid with shortest game
+    #query = "SELECT o.game_id, Min((Case When o.Spieler1_Avg > o.Spieler2_Avg Then o.Spieler1_Avg ELSE o.Spieler2_Avg END))as maxAVG FROM dartgame_header o where o.Ergebnis <> \"läuft\" and abs(julianday(o.Startzeit)-julianday(o.Endzeit)) > 0.0009"
+
+    cursor.execute(query)
+    result = cursor.fetchall()
+    print(result[0])
+    list_result = [str(x) for x in result]
+    stats = " ".join(list_result)
+    stats = "<p>Spiel mit höchstem Average</p><br><p>" + stats + "</p>"
+    return stats
 
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/stats')
+def stats():
+    stats = getStatsFromDatabase()
+    return render_template('stats.html', stats=stats)
 
 @app.route('/streams')
 def fullscreen():

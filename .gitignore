@@ -46,3 +46,13 @@ esp_display/old/webserver_2displays/secrets.h
 esp_display/old/WebSocketClientSocketIO/WebSocketClientSocketIO/secrets.h
 esp_display/old/
 nativeHTML/server.txt
+.$dart_diagram.drawio.bkp
+dart_diagram.drawio
+diagram.pdf
+diagram2.pdf
+nativeHTML/docker
+nativeHTML/docker-compose.yml
+nativeHTML/database/darts.db
+nativeHTML/docker
+nativeHTML/docker-compose.yml
+nativeHTML/database/darts.db
